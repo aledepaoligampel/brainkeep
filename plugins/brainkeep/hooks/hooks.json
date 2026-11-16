@@ -1,0 +1,17 @@
+{
+  "description": "Brainkeep: after editing pcdd/changes/*.md (Edit/Write or shell) or publishing/opening an artifact, remind the model to record progress or the link in Brainkeep.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|Bash|Artifact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -I \"${CLAUDE_PLUGIN_ROOT}/hooks/pcdd_reminder.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+/target/
+/.brainkeep/
+/.local-tools/
+*.db
+*.db-shm
+*.db-wal
+__pycache__/
+/.brainkeep-demo-backup.sqlite
+/.brainkeep-restored/
+/panel-ui/node_modules/

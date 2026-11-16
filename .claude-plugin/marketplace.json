@@ -1,0 +1,14 @@
+{
+  "name": "brainkeep",
+  "owner": {
+    "name": "Brainkeep contributors"
+  },
+  "description": "Claude Code plugins for Brainkeep, shared memory for AI agents.",
+  "plugins": [
+    {
+      "name": "brainkeep",
+      "source": "./plugins/brainkeep",
+      "description": "Brainkeep reminders for PCDD change documents and shared artifacts."
+    }
+  ]
+}

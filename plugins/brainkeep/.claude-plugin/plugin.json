@@ -1,0 +1,10 @@
+{
+  "name": "brainkeep",
+  "version": "0.1.0",
+  "description": "Reminds Claude Code to record PCDD change progress and shared artifact links in Brainkeep.",
+  "author": {
+    "name": "Brainkeep contributors"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/aledepaoligampel/brainkeep"
+}
