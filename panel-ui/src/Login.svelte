@@ -111,10 +111,10 @@
   .ghost .trace { stroke-width: .24; stroke-dasharray: 1.05; stroke-dashoffset: 1.05; animation: ghost-draw 3.2s cubic-bezier(.65, 0, .35, 1) .2s forwards; }
   .ghost .glint { stroke: var(--accent); stroke-width: .42; stroke-dasharray: .08 .92; stroke-dashoffset: 1; opacity: 0;
     animation: ghost-glint 7s linear calc(3.2s + var(--i) * .9s) infinite; }
-  @keyframes ghost-draw { to { stroke-dashoffset: 0; } }
+  @keyframes ghost-draw { 99.9% { stroke-dasharray: 1.05; } to { stroke-dashoffset: 0; stroke-dasharray: none; } }
   @keyframes ghost-glint { 0% { stroke-dashoffset: 1; opacity: 0; } 8%, 85% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
   @media (prefers-reduced-motion: reduce) {
-    .ghost .trace { animation: none; stroke-dashoffset: 0; }
+    .ghost .trace { animation: none; stroke-dasharray: none; }
     .ghost .glint { display: none; }
   }
   .words { position: relative; display: flex; flex-direction: column; gap: 20px; max-width: 560px; }
