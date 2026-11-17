@@ -22,7 +22,7 @@ jobs:
             runner: ubuntu-24.04
           - arch: aarch64
             os: macos
-            runner: macos-14
+            runner: macos-latest
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     permissions:
