@@ -181,7 +181,6 @@
   :global(.menu) .kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 4px 10px 6px; font-size: 12px; }
   :global(.menu) .kv dt { color: var(--muted); }
   :global(.menu) .kv dd { margin: 0; text-align: right; }
-  :global(.menu) svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .small { margin: 4px 6px; font-size: 12px; }
   /* Phone: a compact top bar; projects scroll sideways. */
   @media (max-width: 800px) {
