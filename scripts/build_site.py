@@ -7,7 +7,7 @@ site/ is served as plain files (Cloudflare Pages, no build on the host). This sc
 renders site-src/index.html once per language (site-src/i18n/<lang>.json), copies the
 panel's design tokens and fonts so the site never drifts from the panel, and publishes
 the stylesheets, scripts and screenshots (site-src/screenshots/) under content-hashed
-names in site/assets/h/. Commit its output. --check exits 1 when the
+names in site/assets/h/, and the local installer (site-src/install.sh, as site/install.sh). Commit its output. --check exits 1 when the
 committed files are out of date.
 """
 import hashlib
@@ -41,6 +41,11 @@ def tokens_css():
     head = THEME.read_text(encoding="utf-8").split("*, *::before")[0].rstrip() + "\n"
     head = head.replace("url('./fonts/", "url('/assets/fonts/")
     return ("/* Generated from panel-ui/src/theme.css by scripts/build_site.py. Do not edit. */\n" + head).encode()
+
+
+def installer():
+    """site-src/install.sh with the current release version (brainkeep.dev/install.sh)."""
+    return (SRC / "install.sh").read_text(encoding="utf-8").replace("@VERSION@", version()).encode()
 
 
 def lookup(ctx, path):
@@ -103,7 +108,7 @@ def structured_data(ctx, lang, path):
 
 
 def outputs():
-    files = {"assets/tokens.css": tokens_css(), "favicon.svg": ICON.read_bytes()}
+    files = {"assets/tokens.css": tokens_css(), "favicon.svg": ICON.read_bytes(), "install.sh": installer()}
     for font in sorted(FONTS.glob("*.woff2")):
         files["assets/fonts/" + font.name] = font.read_bytes()
 

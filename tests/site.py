@@ -256,23 +256,47 @@ class SiteTests(unittest.TestCase):
         out = build.render("{% for x in items %}<i>{{x.t}}</i>{% endfor %}|{{a}}", ctx, {"site.css": "/x"})
         self.assertEqual(out, "<i>{{a}} {{asset:site.css}}</i>|A")
 
-    def test_quick_start_uses_the_installed_binary_and_a_published_version(self):
+    def test_quick_start_is_the_one_line_installer(self):
+        for lang, (path, _) in PAGES.items():
+            page = parse(path)
+            found = re.search(r'<pre[^>]*id="qs-install"[^>]*>(.*?)</pre>', path.read_text(encoding="utf-8"), re.S)
+            self.assertTrue(found, f"{lang}: no install command")
+            self.assertEqual(html.unescape(found.group(1)), "curl -fsSL https://brainkeep.dev/install.sh | sh")
+            self.assertTrue(page.find("button", **{"data-copy": "qs-install"}), f"{lang}: copy button for the command")
+            self.assertTrue(page.find("a", href="/install.sh"), f"{lang}: the script can be read before running it")
+            self.assertTrue(page.find("details", **{"class": "manual"}), f"{lang}: manual steps stay available")
+
+    def test_installer_is_published_with_the_current_version(self):
+        cargo = re.search(r'^version\s*=\s*"([^"]+)"', (ROOT / "Cargo.toml").read_text(encoding="utf-8"), re.M).group(1)
+        script = (SITE / "install.sh").read_text(encoding="utf-8")
+        self.assertEqual(script, (SRC / "install.sh").read_text(encoding="utf-8").replace("@VERSION@", cargo))
+        self.assertIn(f"version=${{BRAINKEEP_VERSION:-{cargo}}}", script)
+        self.assertTrue(script.startswith("#!/bin/sh\n"))
+        self.assertRegex(script.rstrip("\n").splitlines()[-1], r'^main "\$@"$')
+        headers = (SITE / "_headers").read_text(encoding="utf-8")
+        self.assertRegex(headers, r"(?m)^/install\.sh\n\s+Content-Type: text/plain; charset=utf-8")
+        self.assertNotRegex(headers, r"(?m)^/install\.sh\n(\s+.*\n)*?\s+Cache-Control:.*immutable",
+                            "a new release must reach users: the installer is never cached as immutable")
+
+    def test_manual_steps_use_the_installed_binary_and_a_published_version(self):
         cargo = re.search(r'^version\s*=\s*"([^"]+)"', (ROOT / "Cargo.toml").read_text(encoding="utf-8"), re.M).group(1)
         targets = {"macos": "t=brainkeep-$v-aarch64-macos", "linux": "t=brainkeep-$v-$(uname -m)-linux"}
         for lang, (path, _) in PAGES.items():
             text = path.read_text(encoding="utf-8")
             for system, target in targets.items():
                 found = re.search(rf'<pre[^>]*id="qs-{system}"[^>]*>(.*?)</pre>', text, re.S)
-                self.assertTrue(found, f"{lang}: no quick start for {system}")
+                self.assertTrue(found, f"{lang}: no manual steps for {system}")
                 block = html.unescape(re.sub(r"<[^>]+>", "", found.group(1)))
                 self.assertNotRegex(block, r"(?m)^brainkeep ", "the binary is not on PATH right after copying it")
+                self.assertNotRegex(block, r"serve &", "a background server dies with the terminal")
+                self.assertIn("claude mcp add --scope user brainkeep", block)
                 self.assertIn(f"v={cargo};", block)
                 self.assertIn(target, block)
                 self.assertIn("shasum -a 256 -c", block)
-                self.assertEqual(len(re.findall(r"(?m)^# ", block)), 3, f"{lang}/{system}: three commented steps")
+                self.assertEqual(len(re.findall(r"(?m)^# ", block)), 4, f"{lang}/{system}: four commented steps")
                 self.assertLessEqual(max(len(line) for line in block.splitlines()), 64, f"{lang}/{system}: long line")
             copy = parse(path).find("button", **{"data-copy": "qs-macos"})
-            self.assertTrue(copy, f"{lang}: copy button targets the default system")
+            self.assertTrue(copy, f"{lang}: manual copy button targets the default system")
 
     def test_security_headers(self):
         text = (SITE / "_headers").read_text(encoding="utf-8")

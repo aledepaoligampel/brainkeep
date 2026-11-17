@@ -153,7 +153,7 @@
     "paths": [
       {
         "title": "Local, un usuario",
-        "body": "Descargá un release y conectá tus agentes.",
+        "body": "Un comando lo instala y conecta Claude Code.",
         "href": "https://github.com/aledepaoligampel/brainkeep#quick-start-local-single-user"
       },
       {
@@ -166,12 +166,17 @@
     "term": "Inicio rápido",
     "copy": "Copiar",
     "copied": "Copiado",
-    "copyLabel": "Copiar los comandos de inicio rápido",
-    "copiedStatus": "Comandos copiados.",
+    "copyLabel": "Copiar el comando de instalación",
+    "copiedStatus": "Copiado.",
     "system": "Sistema operativo",
     "step1": "Descargar y verificar",
     "step2": "Instalar",
-    "step3": "Iniciar y conectar Claude Code"
+    "step3": "Iniciar el servidor (dejá esta terminal abierta)",
+    "does": "Baja el release actual, verifica su SHA-256, instala ~/.local/bin/brainkeep, deja el servidor corriendo como servicio de usuario y conecta Claude Code. Volvé a correrlo para actualizar.",
+    "script": "Leer el script.",
+    "manual": "Instalar a mano",
+    "copyManualLabel": "Copiar los comandos de instalación manual",
+    "step4": "Conectar Claude Code (en otra terminal)"
   },
   "cta": {
     "title1": "Dales a tus agentes",

@@ -153,7 +153,7 @@
     "paths": [
       {
         "title": "Local, single user",
-        "body": "Download a release and connect your agents.",
+        "body": "One command installs it and connects Claude Code.",
         "href": "https://github.com/aledepaoligampel/brainkeep#quick-start-local-single-user"
       },
       {
@@ -166,12 +166,17 @@
     "term": "Quick start",
     "copy": "Copy",
     "copied": "Copied",
-    "copyLabel": "Copy the quick start commands",
-    "copiedStatus": "Commands copied.",
+    "copyLabel": "Copy the install command",
+    "copiedStatus": "Copied.",
     "system": "Operating system",
     "step1": "Download and verify",
     "step2": "Install",
-    "step3": "Run and connect Claude Code"
+    "step3": "Run the server (keep this terminal open)",
+    "does": "Downloads the current release, checks its SHA-256, installs ~/.local/bin/brainkeep, keeps the server running as a user service and connects Claude Code. Rerun it to upgrade.",
+    "script": "Read the script.",
+    "manual": "Install manually",
+    "copyManualLabel": "Copy the manual install commands",
+    "step4": "Connect Claude Code (in another terminal)"
   },
   "cta": {
     "title1": "Give your agents",

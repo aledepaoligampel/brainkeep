@@ -23,8 +23,24 @@ across sessions, tools and people.
 
 ## Quick start (local, single user)
 
-Download a [release](https://github.com/aledepaoligampel/brainkeep/releases) (macOS on
-Apple silicon, or Linux `aarch64`/`x86_64`), check it and put the binary on your `PATH`:
+macOS on Apple silicon, or Linux `aarch64`/`x86_64`:
+
+```sh
+curl -fsSL https://brainkeep.dev/install.sh | sh
+```
+
+The [script](site-src/install.sh) downloads the current
+[release](https://github.com/aledepaoligampel/brainkeep/releases), checks it against the
+release's `SHA256SUMS` (nothing is installed on a mismatch), puts the binary in
+`~/.local/bin/brainkeep` and keeps `brainkeep serve` running as a user service: a
+LaunchAgent (`~/Library/LaunchAgents/dev.brainkeep.serve.plist`) on macOS, a
+`systemd --user` unit (`brainkeep.service`) on Linux. Then it connects Claude Code for all
+your projects (`claude mcp add --scope user`), unless a server named `brainkeep` already
+exists. Data lives in `~/.brainkeep`. No root needed. Run it again to upgrade; set
+`BRAINKEEP_VERSION` for a specific release. Other agents: [docs/clients.md](docs/clients.md).
+
+<details>
+<summary>Manual install</summary>
 
 ```sh
 v=0.1.1; t=brainkeep-$v-aarch64-macos    # Linux: t=brainkeep-$v-$(uname -m)-linux
@@ -33,13 +49,34 @@ curl -fLO $base/$t.tar.gz && curl -fLO $base/SHA256SUMS
 grep " $t.tar.gz\$" SHA256SUMS | shasum -a 256 -c
 tar -xzf $t.tar.gz && mkdir -p ~/.local/bin && cp $t/brainkeep ~/.local/bin/
 
-brainkeep --data-dir ~/.brainkeep serve &
-claude mcp add brainkeep -- ~/.local/bin/brainkeep --data-dir ~/.brainkeep mcp
+~/.local/bin/brainkeep --data-dir ~/.brainkeep serve      # keep it running
+claude mcp add --scope user brainkeep -- ~/.local/bin/brainkeep --data-dir ~/.brainkeep mcp
 ```
 
 `serve` owns the database; `mcp` is the stdio bridge each local agent starts. The macOS
 binary is not notarized: download it with `curl` as above (a browser download is
 quarantined by Gatekeeper). To build from source instead: `cargo build --locked --release`.
+
+</details>
+
+<details>
+<summary>Uninstall</summary>
+
+```sh
+# macOS
+launchctl bootout gui/$(id -u)/dev.brainkeep.serve
+rm ~/Library/LaunchAgents/dev.brainkeep.serve.plist
+# Linux
+systemctl --user disable --now brainkeep.service
+rm "${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user/brainkeep.service"
+systemctl --user daemon-reload
+
+claude mcp remove --scope user brainkeep
+rm ~/.local/bin/brainkeep
+rm -rf ~/.brainkeep    # deletes every memory
+```
+
+</details>
 
 ## Server for a team
 

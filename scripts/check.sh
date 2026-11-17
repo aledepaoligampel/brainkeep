@@ -12,3 +12,6 @@ for test in protocol http_protocol oauth_protocol compact_protocol panel_protoco
 done
 node tests/panel_render.mjs
 python3 tests/site.py
+python3 tests/install.py
+# The installer also runs under dash, /bin/sh on Debian and Ubuntu.
+if [ -x /bin/dash ]; then INSTALL_SH=/bin/dash python3 tests/install.py; fi

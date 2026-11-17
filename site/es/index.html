@@ -30,9 +30,9 @@
 <link rel="preload" href="/assets/fonts/lora-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/lora-latin-wght-italic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/h/tokens.742f44fd47.css">
-<link rel="stylesheet" href="/assets/h/site.406cd57f29.css">
+<link rel="stylesheet" href="/assets/h/site.b396d531eb.css">
 <script src="/assets/h/theme.cd9d1c28a0.js"></script>
-<script src="/assets/h/site.743bfcdb0a.js" defer></script>
+<script src="/assets/h/site.5472d88602.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Ir al contenido</a>
@@ -298,7 +298,7 @@
       <p class="body-lg">Corrélo en local para vos en un minuto, o en cualquier host Linux con systemd detrás de HTTPS para todo tu equipo. Alcanza con una Raspberry Pi.</p>
       <ul class="paths">
         
-        <li><a class="path" href="https://github.com/aledepaoligampel/brainkeep#quick-start-local-single-user"><span><strong>Local, un usuario</strong><span>Descargá un release y conectá tus agentes.</span></span><svg class="ic" aria-hidden="true" width="16" height="16"><use href="#i-out"/></svg></a></li>
+        <li><a class="path" href="https://github.com/aledepaoligampel/brainkeep#quick-start-local-single-user"><span><strong>Local, un usuario</strong><span>Un comando lo instala y conecta Claude Code.</span></span><svg class="ic" aria-hidden="true" width="16" height="16"><use href="#i-out"/></svg></a></li>
         
         <li><a class="path" href="https://github.com/aledepaoligampel/brainkeep/blob/main/docs/server.md"><span><strong>Servidor para un equipo</strong><span>Usuarios, permisos, inicio con Google y backups.</span></span><svg class="ic" aria-hidden="true" width="16" height="16"><use href="#i-out"/></svg></a></li>
         
@@ -307,13 +307,22 @@
     </div>
     <div class="card terminal">
       <div class="terminal-head">
-        <div class="seg" role="group" aria-label="Sistema operativo">
-          <button type="button" data-os="qs-macos" aria-pressed="true" aria-label="macOS">macOS</button>
-          <button type="button" data-os="qs-linux" aria-pressed="false" aria-label="Linux">Linux</button>
-        </div>
-        <button type="button" class="btn copy" data-copy="qs-macos" data-copied="Copiado" data-status="Comandos copiados." aria-label="Copiar los comandos de inicio rápido"><svg class="ic" aria-hidden="true" width="16" height="16"><use href="#i-copy"/></svg><span class="copy-text">Copiar</span></button>
+        <span class="terminal-title">Inicio rápido</span>
+        <button type="button" class="btn copy" data-copy="qs-install" data-copied="Copiado" data-status="Copiado." aria-label="Copiar el comando de instalación"><svg class="ic" aria-hidden="true" width="16" height="16"><use href="#i-copy"/></svg><span class="copy-text">Copiar</span></button>
       </div>
-      <pre class="code terminal-body" id="qs-macos" tabindex="0" role="region" aria-label="Inicio rápido · macOS"><span class="c"># 1 · Descargar y verificar</span>
+      <pre class="code terminal-body one-line" id="qs-install" tabindex="0" role="region" aria-label="Inicio rápido">curl -fsSL https://brainkeep.dev/install.sh | sh</pre>
+      <p class="terminal-note">Baja el release actual, verifica su SHA-256, instala ~/.local/bin/brainkeep, deja el servidor corriendo como servicio de usuario y conecta Claude Code. Volvé a correrlo para actualizar. <a href="/install.sh">Leer el script.</a></p>
+      <details class="manual">
+        <summary>Instalar a mano</summary>
+        <div class="manual-panes">
+          <div class="terminal-head">
+            <div class="seg" role="group" aria-label="Sistema operativo">
+              <button type="button" data-os="qs-macos" aria-pressed="true" aria-label="macOS">macOS</button>
+              <button type="button" data-os="qs-linux" aria-pressed="false" aria-label="Linux">Linux</button>
+            </div>
+            <button type="button" class="btn copy" data-copy="qs-macos" data-copied="Copiado" data-status="Copiado." aria-label="Copiar los comandos de instalación manual"><svg class="ic" aria-hidden="true" width="16" height="16"><use href="#i-copy"/></svg><span class="copy-text">Copiar</span></button>
+          </div>
+          <pre class="code terminal-body" id="qs-macos" tabindex="0" role="region" aria-label="Instalar a mano · macOS"><span class="c"># 1 · Descargar y verificar</span>
 v=0.1.1; t=brainkeep-$v-aarch64-macos
 repo=https://github.com/aledepaoligampel/brainkeep
 base=$repo/releases/download/v$v
@@ -324,11 +333,13 @@ grep " $t.tar.gz\$" SHA256SUMS | shasum -a 256 -c
 tar -xzf $t.tar.gz &amp;&amp; mkdir -p ~/.local/bin
 cp $t/brainkeep ~/.local/bin/
 
-<span class="c"># 3 · Iniciar y conectar Claude Code</span>
-~/.local/bin/brainkeep --data-dir ~/.brainkeep serve &amp;
-claude mcp add brainkeep -- \
+<span class="c"># 3 · Iniciar el servidor (dejá esta terminal abierta)</span>
+~/.local/bin/brainkeep --data-dir ~/.brainkeep serve
+
+<span class="c"># 4 · Conectar Claude Code (en otra terminal)</span>
+claude mcp add --scope user brainkeep -- \
   ~/.local/bin/brainkeep --data-dir ~/.brainkeep mcp</pre>
-      <pre class="code terminal-body" id="qs-linux" tabindex="0" role="region" aria-label="Inicio rápido · Linux" hidden><span class="c"># 1 · Descargar y verificar</span>
+          <pre class="code terminal-body" id="qs-linux" tabindex="0" role="region" aria-label="Instalar a mano · Linux" hidden><span class="c"># 1 · Descargar y verificar</span>
 v=0.1.1; t=brainkeep-$v-$(uname -m)-linux
 repo=https://github.com/aledepaoligampel/brainkeep
 base=$repo/releases/download/v$v
@@ -339,10 +350,14 @@ grep " $t.tar.gz\$" SHA256SUMS | shasum -a 256 -c
 tar -xzf $t.tar.gz &amp;&amp; mkdir -p ~/.local/bin
 cp $t/brainkeep ~/.local/bin/
 
-<span class="c"># 3 · Iniciar y conectar Claude Code</span>
-~/.local/bin/brainkeep --data-dir ~/.brainkeep serve &amp;
-claude mcp add brainkeep -- \
+<span class="c"># 3 · Iniciar el servidor (dejá esta terminal abierta)</span>
+~/.local/bin/brainkeep --data-dir ~/.brainkeep serve
+
+<span class="c"># 4 · Conectar Claude Code (en otra terminal)</span>
+claude mcp add --scope user brainkeep -- \
   ~/.local/bin/brainkeep --data-dir ~/.brainkeep mcp</pre>
+        </div>
+      </details>
       <p class="sr" role="status" aria-live="polite" id="copy-status"></p>
     </div>
   </div>

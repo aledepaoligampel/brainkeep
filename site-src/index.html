@@ -240,13 +240,22 @@
     </div>
     <div class="card terminal">
       <div class="terminal-head">
-        <div class="seg" role="group" aria-label="{{self.system}}">
-          <button type="button" data-os="qs-macos" aria-pressed="true" aria-label="macOS">macOS</button>
-          <button type="button" data-os="qs-linux" aria-pressed="false" aria-label="Linux">Linux</button>
-        </div>
-        <button type="button" class="btn copy" data-copy="qs-macos" data-copied="{{self.copied}}" data-status="{{self.copiedStatus}}" aria-label="{{self.copyLabel}}"><svg class="ic" aria-hidden="true" width="16" height="16"><use href="#i-copy"/></svg><span class="copy-text">{{self.copy}}</span></button>
+        <span class="terminal-title">{{self.term}}</span>
+        <button type="button" class="btn copy" data-copy="qs-install" data-copied="{{self.copied}}" data-status="{{self.copiedStatus}}" aria-label="{{self.copyLabel}}"><svg class="ic" aria-hidden="true" width="16" height="16"><use href="#i-copy"/></svg><span class="copy-text">{{self.copy}}</span></button>
       </div>
-      <pre class="code terminal-body" id="qs-macos" tabindex="0" role="region" aria-label="{{self.term}} · macOS"><span class="c"># 1 · {{self.step1}}</span>
+      <pre class="code terminal-body one-line" id="qs-install" tabindex="0" role="region" aria-label="{{self.term}}">curl -fsSL https://brainkeep.dev/install.sh | sh</pre>
+      <p class="terminal-note">{{self.does}} <a href="/install.sh">{{self.script}}</a></p>
+      <details class="manual">
+        <summary>{{self.manual}}</summary>
+        <div class="manual-panes">
+          <div class="terminal-head">
+            <div class="seg" role="group" aria-label="{{self.system}}">
+              <button type="button" data-os="qs-macos" aria-pressed="true" aria-label="macOS">macOS</button>
+              <button type="button" data-os="qs-linux" aria-pressed="false" aria-label="Linux">Linux</button>
+            </div>
+            <button type="button" class="btn copy" data-copy="qs-macos" data-copied="{{self.copied}}" data-status="{{self.copiedStatus}}" aria-label="{{self.copyManualLabel}}"><svg class="ic" aria-hidden="true" width="16" height="16"><use href="#i-copy"/></svg><span class="copy-text">{{self.copy}}</span></button>
+          </div>
+          <pre class="code terminal-body" id="qs-macos" tabindex="0" role="region" aria-label="{{self.manual}} · macOS"><span class="c"># 1 · {{self.step1}}</span>
 v={{version}}; t=brainkeep-$v-aarch64-macos
 repo=https://github.com/aledepaoligampel/brainkeep
 base=$repo/releases/download/v$v
@@ -258,10 +267,12 @@ tar -xzf $t.tar.gz &amp;&amp; mkdir -p ~/.local/bin
 cp $t/brainkeep ~/.local/bin/
 
 <span class="c"># 3 · {{self.step3}}</span>
-~/.local/bin/brainkeep --data-dir ~/.brainkeep serve &amp;
-claude mcp add brainkeep -- \
+~/.local/bin/brainkeep --data-dir ~/.brainkeep serve
+
+<span class="c"># 4 · {{self.step4}}</span>
+claude mcp add --scope user brainkeep -- \
   ~/.local/bin/brainkeep --data-dir ~/.brainkeep mcp</pre>
-      <pre class="code terminal-body" id="qs-linux" tabindex="0" role="region" aria-label="{{self.term}} · Linux" hidden><span class="c"># 1 · {{self.step1}}</span>
+          <pre class="code terminal-body" id="qs-linux" tabindex="0" role="region" aria-label="{{self.manual}} · Linux" hidden><span class="c"># 1 · {{self.step1}}</span>
 v={{version}}; t=brainkeep-$v-$(uname -m)-linux
 repo=https://github.com/aledepaoligampel/brainkeep
 base=$repo/releases/download/v$v
@@ -273,9 +284,13 @@ tar -xzf $t.tar.gz &amp;&amp; mkdir -p ~/.local/bin
 cp $t/brainkeep ~/.local/bin/
 
 <span class="c"># 3 · {{self.step3}}</span>
-~/.local/bin/brainkeep --data-dir ~/.brainkeep serve &amp;
-claude mcp add brainkeep -- \
+~/.local/bin/brainkeep --data-dir ~/.brainkeep serve
+
+<span class="c"># 4 · {{self.step4}}</span>
+claude mcp add --scope user brainkeep -- \
   ~/.local/bin/brainkeep --data-dir ~/.brainkeep mcp</pre>
+        </div>
+      </details>
       <p class="sr" role="status" aria-live="polite" id="copy-status"></p>
     </div>
   </div>

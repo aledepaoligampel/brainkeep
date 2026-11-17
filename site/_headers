@@ -13,3 +13,9 @@
 
 /assets/fonts/*
   Cache-Control: public, max-age=604800
+
+# The one-line installer (curl -fsSL https://brainkeep.dev/install.sh | sh): readable in a browser,
+# and a new release reaches users within minutes.
+/install.sh
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=300

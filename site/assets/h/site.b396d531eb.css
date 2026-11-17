@@ -212,6 +212,14 @@ h1, h2, h3, p, figure, dl, dd { margin: 0; }
 .terminal-body[hidden] { display: none; }
 /* Long lines wrap instead of scrolling; copying uses the text, so wrapping never changes the commands. */
 .terminal-body { border: 0; border-radius: 0; padding: 22px 24px; font-size: 13px; line-height: 1.85; white-space: pre-wrap; overflow-wrap: anywhere; }
+.terminal-title { padding-left: 6px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.terminal-body.one-line { padding-bottom: 8px; font-size: 15px; }
+.terminal-note { padding: 0 24px 20px; font-size: 13px; line-height: 1.6; color: var(--ink-2); }
+.terminal-note a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; }
+.manual { border-top: 1px solid var(--line); }
+.manual summary { padding: 14px 24px; font-size: 13px; font-weight: 600; color: var(--ink-2); cursor: pointer; }
+.manual summary:hover { color: var(--ink); }
+.manual .terminal-head { border-top: 1px solid var(--line); }
 
 /* Closing call to action and footer */
 .cta { background: var(--side); }

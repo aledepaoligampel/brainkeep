@@ -17,10 +17,10 @@
     });
   }
 
-  // Quick start: macOS / Linux switch. The copy button follows the visible block.
+  // Manual install: macOS / Linux switch. The copy button next to it follows the visible block.
   Array.prototype.forEach.call(document.querySelectorAll('[data-os]'), function (tab) {
     tab.addEventListener('click', function () {
-      var card = tab.closest('.terminal');
+      var card = tab.closest('.manual-panes');
       if (!card) return;
       Array.prototype.forEach.call(card.querySelectorAll('[data-os]'), function (other) {
         var active = other === tab;
