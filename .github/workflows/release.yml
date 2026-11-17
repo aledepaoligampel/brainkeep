@@ -1,6 +1,6 @@
 name: release
 
-# A `v*` tag builds Linux binaries on native runners, tests them and publishes a
+# A `v*` tag builds Linux and macOS binaries on native runners, tests them and publishes a
 # GitHub Release with SHA256SUMS and build provenance. `deploy/upgrade.sh` installs it.
 
 on:
@@ -15,15 +15,21 @@ jobs:
       matrix:
         include:
           - arch: aarch64
+            os: linux
             runner: ubuntu-24.04-arm
           - arch: x86_64
+            os: linux
             runner: ubuntu-24.04
+          - arch: aarch64
+            os: macos
+            runner: macos-14
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     permissions:
       contents: read
     env:
       ARCH: ${{ matrix.arch }}
+      OS: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -54,17 +60,20 @@ jobs:
           done
       - name: Package
         run: |
-          name="brainkeep-${GITHUB_REF_NAME#v}-$ARCH-linux"
+          name="brainkeep-${GITHUB_REF_NAME#v}-$ARCH-$OS"
+          # GNU tar for reproducible archives; macOS runners ship it as gtar.
+          if tar --version 2>/dev/null | grep -q 'GNU tar'; then gnutar=tar; else gnutar=gtar; fi
+          command -v "$gnutar" >/dev/null || { echo 'GNU tar not found' >&2; exit 1; }
           mkdir -p "dist/$name"
           cp target/release/brainkeep LICENSE THIRD_PARTY_NOTICES.md "dist/$name/"
           cp -R deploy tests "dist/$name/"
           find "dist/$name" -name __pycache__ -prune -exec rm -rf {} +
           # Same commit, same bytes: fixed mtime, owners and order; gzip without a timestamp.
-          tar -C dist --sort=name --owner=0 --group=0 --numeric-owner --mtime="@$(git log -1 --format=%ct)" -cf - "$name" \
+          "$gnutar" -C dist --sort=name --owner=0 --group=0 --numeric-owner --mtime="@$(git log -1 --format=%ct)" -cf - "$name" \
             | gzip -9n > "dist/$name.tar.gz"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: brainkeep-${{ matrix.arch }}
+          name: brainkeep-${{ matrix.arch }}-${{ matrix.os }}
           path: dist/*.tar.gz
           if-no-files-found: error
 

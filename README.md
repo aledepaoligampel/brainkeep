@@ -23,13 +23,23 @@ across sessions, tools and people.
 
 ## Quick start (local, single user)
 
+Download a [release](https://github.com/aledepaoligampel/brainkeep/releases) (macOS on
+Apple silicon, or Linux `aarch64`/`x86_64`), check it and put the binary on your `PATH`:
+
 ```sh
-cargo build --release
-./target/release/brainkeep --data-dir ~/.brainkeep serve &
-claude mcp add brainkeep -- "$PWD/target/release/brainkeep" --data-dir ~/.brainkeep mcp
+v=0.1.0; t=brainkeep-$v-aarch64-macos    # Linux: t=brainkeep-$v-$(uname -m)-linux
+base=https://github.com/aledepaoligampel/brainkeep/releases/download/v$v
+curl -fLO $base/$t.tar.gz && curl -fLO $base/SHA256SUMS
+grep " $t.tar.gz\$" SHA256SUMS | shasum -a 256 -c
+tar -xzf $t.tar.gz && mkdir -p ~/.local/bin && cp $t/brainkeep ~/.local/bin/
+
+brainkeep --data-dir ~/.brainkeep serve &
+claude mcp add brainkeep -- ~/.local/bin/brainkeep --data-dir ~/.brainkeep mcp
 ```
 
-`serve` owns the database; `mcp` is the stdio bridge each local agent starts.
+`serve` owns the database; `mcp` is the stdio bridge each local agent starts. The macOS
+binary is not notarized: download it with `curl` as above (a browser download is
+quarantined by Gatekeeper). To build from source instead: `cargo build --locked --release`.
 
 ## Server for a team
 
