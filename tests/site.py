@@ -220,14 +220,26 @@ class SiteTests(unittest.TestCase):
                     self.assertTrue(file.is_file(), f"{lang}: {ref}")
 
     def test_assets_are_versioned_by_content(self):
+        # The hash is part of the file name, never a query string: a stale file can never be
+        # cached under a new URL, because the new path only exists with the new content.
         for lang, (path, _) in PAGES.items():
             page = parse(path)
-            refs = [a["href"] for a in page.find("link", rel="stylesheet")] + [a["src"] for a in page.find("script") if "src" in a]
+            refs = ([a["href"] for a in page.find("link", rel="stylesheet")] + [a["src"] for a in page.find("script") if "src" in a]
+                    + [a["src"] for a in page.find("img") if a.get("src", "").startswith("/assets/")])
             self.assertTrue(refs, lang)
             for ref in refs:
-                name, _, query = ref.partition("?v=")
-                digest = hashlib.sha256((SITE / name.lstrip("/")).read_bytes()).hexdigest()[:10]
-                self.assertEqual(query, digest, f"{lang}: {ref}")
+                self.assertNotIn("?", ref, f"{lang}: {ref}")
+                found = re.fullmatch(r"/assets/h/[\w-]+\.([0-9a-f]{10})\.\w+", ref)
+                self.assertTrue(found, f"{lang}: {ref}")
+                digest = hashlib.sha256((SITE / ref.lstrip("/")).read_bytes()).hexdigest()[:10]
+                self.assertEqual(found.group(1), digest, f"{lang}: {ref}")
+
+    def test_hashed_assets_are_all_referenced(self):
+        pages = "".join(p.read_text(encoding="utf-8") for p in [*(p for p, _ in PAGES.values()), SITE / "404.html"])
+        hashed = sorted((SITE / "assets" / "h").iterdir())
+        self.assertTrue(hashed)
+        for file in hashed:
+            self.assertIn("/assets/h/" + file.name, pages, f"orphan {file.name}")
 
     def test_design_tokens_and_fonts_come_from_the_panel(self):
         self.assertEqual(tokens((SITE / "assets" / "tokens.css").read_text(encoding="utf-8")), panel_tokens())
@@ -274,7 +286,10 @@ class SiteTests(unittest.TestCase):
         self.assertIn("object-src 'none'", csp)
         for header in ("Strict-Transport-Security", "X-Content-Type-Options: nosniff", "Referrer-Policy"):
             self.assertIn(header, text)
-        self.assertRegex(text, r"/assets/\*\n\s+Cache-Control: public, max-age=31536000, immutable")
+        # Only content-named files are immutable; no other rule may match them and merge a second value.
+        self.assertRegex(text, r"/assets/h/\*\n\s+Cache-Control: public, max-age=31536000, immutable")
+        self.assertEqual(text.count("immutable"), 1)
+        self.assertNotRegex(text, r"(?m)^/assets/\*$")
 
 
 if __name__ == "__main__":

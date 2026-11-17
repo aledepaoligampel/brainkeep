@@ -5,6 +5,11 @@
   Cross-Origin-Opener-Policy: same-origin
   Content-Security-Policy: default-src 'self'; connect-src 'self' https://cloudflareinsights.com; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
 
-# CSS and JS are referenced with ?v=<content hash>; fonts keep the panel's file names.
-/assets/*
+# Pages reference CSS, JS and images only under content-hashed names (scripts/build_site.py),
+# so those never change. Fonts keep the panel's file names and are cached for a week.
+# Keep these rules disjoint: Pages merges the values of every rule that matches a path.
+/assets/h/*
   Cache-Control: public, max-age=31536000, immutable
+
+/assets/fonts/*
+  Cache-Control: public, max-age=604800

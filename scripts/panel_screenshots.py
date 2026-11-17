@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Render the landing's panel screenshots (site/assets/panel-<lang>-<theme>.png) from the real
-panel filled with fictional data.
+"""Render the landing's panel screenshots (site-src/screenshots/panel-<lang>-<theme>.png)
+from the real panel filled with fictional data.
 
 Usage: python3 scripts/panel_screenshots.py
 
 Per language it starts a throwaway server on a temporary data directory, invites the
 fictional team from site-src/demo/<lang>.json through the panel API, saves their memories
 over MCP, backdates the revisions so the list reads like a lived-in project, and captures
-the panel with headless Chrome in light and dark. Nothing touches ~/.brainkeep or the
-network. Build the binary first (cargo build); set BRAINKEEP_BINARY or CHROME to override.
+the panel with headless Chrome in light and dark. Run scripts/build_site.py afterwards to
+publish them. Nothing touches ~/.brainkeep or the network. Build the binary first
+(cargo build); set BRAINKEEP_BINARY or CHROME to override.
 """
 import base64
 import datetime
@@ -305,7 +306,7 @@ def main():
     if not Path(CHROME).exists():
         print(f"Chrome not found at {CHROME}; set CHROME.")
         return 1
-    out_dir = ROOT / "site" / "assets"
+    out_dir = ROOT / "site-src" / "screenshots"
     now = datetime.datetime.now(datetime.timezone.utc)
     for lang in LANGS:
         demo = json.loads((ROOT / "site-src" / "demo" / f"{lang}.json").read_text(encoding="utf-8"))

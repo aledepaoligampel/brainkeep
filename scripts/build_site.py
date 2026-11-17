@@ -5,8 +5,9 @@ Usage: python3 scripts/build_site.py [--check]
 
 site/ is served as plain files (Cloudflare Pages, no build on the host). This script
 renders site-src/index.html once per language (site-src/i18n/<lang>.json), copies the
-panel's design tokens and fonts so the site never drifts from the panel, and versions
-the stylesheets and scripts by content. Commit its output. --check exits 1 when the
+panel's design tokens and fonts so the site never drifts from the panel, and publishes
+the stylesheets, scripts and screenshots (site-src/screenshots/) under content-hashed
+names in site/assets/h/. Commit its output. --check exits 1 when the
 committed files are out of date.
 """
 import hashlib
@@ -107,8 +108,15 @@ def outputs():
         files["assets/fonts/" + font.name] = font.read_bytes()
 
     def asset(name):
-        data = files.get("assets/" + name) or (SITE / "assets" / name).read_bytes()
-        return f"/assets/{name}?v={hashlib.sha256(data).hexdigest()[:10]}"
+        """Publish a copy named by its content (assets/h/<stem>.<hash>.<ext>) and return its URL.
+        A query-string version is not enough: during a deploy the edge can cache the old file
+        under the new URL, and the immutable header keeps it there."""
+        shot = SRC / "screenshots" / name
+        data = files.get("assets/" + name) or (shot if shot.is_file() else SITE / "assets" / name).read_bytes()
+        stem, ext = name.rsplit(".", 1)
+        path = f"assets/h/{stem}.{hashlib.sha256(data).hexdigest()[:10]}.{ext}"
+        files[path] = data
+        return "/" + path
 
     assets = {name: asset(name) for name in ("tokens.css", "site.css", "site.js", "theme.js")}
     template = (SRC / "index.html").read_text(encoding="utf-8")
@@ -160,8 +168,8 @@ def main(argv):
     stale = []
     files = outputs()
     # Generated folders hold only generated files: a font removed from the panel must not stay published.
-    for orphan in sorted((SITE / "assets" / "fonts").glob("*")):
-        name = "assets/fonts/" + orphan.name
+    for orphan in sorted([*(SITE / "assets" / "fonts").glob("*"), *(SITE / "assets" / "h").glob("*")]):
+        name = orphan.relative_to(SITE).as_posix()
         if name not in files:
             stale.append(name)
             if not check:

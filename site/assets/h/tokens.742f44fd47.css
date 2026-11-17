@@ -1,0 +1,42 @@
+/* Generated from panel-ui/src/theme.css by scripts/build_site.py. Do not edit. */
+/* Brainkeep design system v2: tokens from the approved canvas. Fonts: SIL OFL 1.1. */
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 100 900; font-display: swap; src: url('/assets/fonts/inter-latin-wght-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Lora'; font-style: normal; font-weight: 400 700; font-display: swap; src: url('/assets/fonts/lora-latin-wght-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Lora'; font-style: italic; font-weight: 400 700; font-display: swap; src: url('/assets/fonts/lora-latin-wght-italic.woff2') format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 100 800; font-display: swap; src: url('/assets/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2'); }
+
+:root {
+  --raised: #FFFFFF; /* selected item / chip on the sidebar */
+  --brand-mark: #7E2142; /* brand icon on light backgrounds */
+  --bg: #FCFAF9; --surface: #FFFFFF; --side: #F9EEF0; --side-line: #F0DDE1; --brand: #F2CDD5; --brand-deep: #E8B4C0;
+  --line: #EEE3E4; --line-strong: #E3D3D6; --ink: #1D1519; --ink-2: #4E4449; --muted: #75696F; --body: #2B2226;
+  --accent: #A8325A; --accent-ink: #7E2142; --accent-soft: #FBE9ED; --accent-line: #F0D3DA; --tint: #FCF6F7; --hover: #F7EFF0;
+  --live: #047857; --live-soft: #E9F5EF; --warn: #8A4B0F; --warn-soft: #FFF4E6; --warn-line: #F3D9B5; --danger: #B42318; --danger-soft: #FDE8E6;
+  --shadow-sm: 0 1px 2px rgba(29, 21, 25, .04); --shadow: 0 1px 2px rgba(29, 21, 25, .04), 0 12px 32px -12px rgba(120, 40, 70, .14);
+  --k-decision: #8E2A4C; --k-decision-bg: #FBE9ED; --k-progress: #1F6A3B; --k-progress-bg: #E8F4EC;
+  --k-discovery: #0B5D73; --k-discovery-bg: #E3F2F5; --k-preference: #6B2A86; --k-preference-bg: #F3EAF8; --k-note: #5A4E54; --k-note-bg: #F2ECEE;
+  --serif: 'Lora', Georgia, serif; --sans: 'Inter', system-ui, sans-serif; --mono: 'JetBrains Mono', ui-monospace, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141012; --surface: #1C1619; --side: #1E171A; --side-line: #33282C; --brand: #E8B4C0; --brand-deep: #C98E9C;
+    --line: #33282C; --line-strong: #44363B; --ink: #F6EEF0; --ink-2: #CDBFC4; --muted: #A99BA1; --body: #E6DCDF;
+    --accent: #F08CAB; --accent-ink: #F6B3C7; --accent-soft: #3A2129; --accent-line: #5A3240; --tint: #211A1D; --hover: #2A2125; --raised: #33282D; --brand-mark: #E8B4C0;
+    --live: #34D399; --live-soft: #12302A; --warn: #F5C27A; --warn-soft: #33260F; --warn-line: #5C4520; --danger: #F59A8F; --danger-soft: #3B1A17;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .3); --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 12px 32px -12px rgba(0, 0, 0, .6);
+    --k-decision: #F6B3C7; --k-decision-bg: #3A2129; --k-progress: #8FD5A6; --k-progress-bg: #17301F;
+    --k-discovery: #8ACFE0; --k-discovery-bg: #122B33; --k-preference: #D3B0E6; --k-preference-bg: #2D1F36; --k-note: #CDBFC4; --k-note-bg: #2A2125;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141012; --surface: #1C1619; --side: #1E171A; --side-line: #33282C; --brand: #E8B4C0; --brand-deep: #C98E9C;
+  --line: #33282C; --line-strong: #44363B; --ink: #F6EEF0; --ink-2: #CDBFC4; --muted: #A99BA1; --body: #E6DCDF;
+  --accent: #F08CAB; --accent-ink: #F6B3C7; --accent-soft: #3A2129; --accent-line: #5A3240; --tint: #211A1D; --hover: #2A2125; --raised: #33282D; --brand-mark: #E8B4C0;
+  --live: #34D399; --live-soft: #12302A; --warn: #F5C27A; --warn-soft: #33260F; --warn-line: #5C4520; --danger: #F59A8F; --danger-soft: #3B1A17;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .3); --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 12px 32px -12px rgba(0, 0, 0, .6);
+  --k-decision: #F6B3C7; --k-decision-bg: #3A2129; --k-progress: #8FD5A6; --k-progress-bg: #17301F;
+  --k-discovery: #8ACFE0; --k-discovery-bg: #122B33; --k-preference: #D3B0E6; --k-preference-bg: #2D1F36; --k-note: #CDBFC4; --k-note-bg: #2A2125;
+  color-scheme: dark;
+}
