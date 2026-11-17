@@ -426,8 +426,9 @@ class Static(Panel):
             self.assertEqual(headers.get('x-content-type-options'), 'nosniff')
             total += len(gzip.compress(body, 9))
             source = body.decode()
-            # XML namespace identifiers are not fetched; any other URL would be a remote resource.
-            self.assertNotRegex(source, r'https?://(?!www\.w3\.org/(?:2000/svg|1999/xhtml|1999/xlink|1998/Math/MathML)\b)', asset)
+            # XML namespace identifiers are not fetched, and the project's site and repository
+            # are plain navigation links; any other URL would be a remote resource.
+            self.assertNotRegex(source, r'https?://(?!www\.w3\.org/(?:2000/svg|1999/xhtml|1999/xlink|1998/Math/MathML)\b|(?:brainkeep\.dev|github\.com/aledepaoligampel/brainkeep)[`\x27\x22])', asset)
             if asset.endswith('.js'):
                 # Assignments and calls that parse HTML or code; the framework's own
                 # comparison against the string 'innerHTML' is not a sink.

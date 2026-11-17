@@ -295,3 +295,11 @@ DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
 ```
+
+## Simple Icons
+
+The sign-in screen embeds the Claude, OpenAI and Google Gemini marks from Simple Icons
+(https://simpleicons.org), released under CC0 1.0 Universal. The marks are trademarks of
+their owners; Brainkeep uses them only to name the clients it works with.
+
+The GitHub mark next to the repository link comes from the same collection.

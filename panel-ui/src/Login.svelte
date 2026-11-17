@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import Brand from './lib/Brand.svelte';
+  import { AGENTS, GITHUB, SITE, REPO } from './lib/agents.js';
   import { app, t, post, boot, setLang } from './lib/state.svelte.js';
 
   let google = $state(false);
@@ -35,37 +36,20 @@
 
 <div class="login">
   <section class="hero">
-    <!-- Outline only: a gradient stroke draws itself, then a glint keeps travelling along the lines. -->
-    <svg class="ghost" viewBox="0 0 48 48" aria-hidden="true">
-      <defs>
-        <linearGradient id="ghost-stroke" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-          <stop offset="0" class="g1"></stop>
-          <stop offset=".5" class="g2"></stop>
-          <stop offset="1" class="g3"></stop>
-          <animateTransform attributeName="gradientTransform" type="rotate" values="0 24 24;360 24 24" dur="14s" repeatCount="indefinite"></animateTransform>
-        </linearGradient>
-        <filter id="ghost-glow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation=".45" result="blur"></feGaussianBlur>
-          <feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
-        </filter>
-      </defs>
-      <path class="trace" pathLength="1" stroke="url(#ghost-stroke)" d="M19.125 4a6.1 6.1 0 0 1 3.625 1.188V15.75H19.8a4 4 0 1 0 0 2.5h2.95v23.996A7.17 7.17 0 0 1 18.043 44a7.21 7.21 0 0 1-6.837-4.928l-.375-1.129A7.75 7.75 0 0 1 4 30.25c0-2.026.78-3.87 2.053-5.25H13c.966 0 1.75.784 1.75 1.75v.45a4 4 0 1 0 2.5 0v-.45A4.25 4.25 0 0 0 13 22.5H7.918A7.46 7.46 0 0 1 6 17.5a7.5 7.5 0 0 1 7.003-7.482A6.123 6.123 0 0 1 19.125 4"></path>
-      <path class="trace" pathLength="1" stroke="url(#ghost-stroke)" d="M28.875 4a6.123 6.123 0 0 1 6.122 6.018A7.5 7.5 0 0 1 42 17.5a7.48 7.48 0 0 1-2.597 5.67a7.75 7.75 0 0 1-2.234 14.773l-.375 1.13A7.21 7.21 0 0 1 29.957 44c-1.8 0-3.444-.663-4.707-1.754V32.25H29A4.25 4.25 0 0 0 33.25 28v-.201a4 4 0 1 0-2.5 0V28A1.75 1.75 0 0 1 29 29.75h-3.75V5.188A6.1 6.1 0 0 1 28.875 4"></path>
-      <path class="trace" pathLength="1" stroke="url(#ghost-stroke)" d="M16 29.5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3"></path>
-      <path class="trace" pathLength="1" stroke="url(#ghost-stroke)" d="M32 22.5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3"></path>
-      <path class="trace" pathLength="1" stroke="url(#ghost-stroke)" d="M16 15.5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3"></path>
-      <path class="glint" pathLength="1" filter="url(#ghost-glow)" style="--i:0" d="M19.125 4a6.1 6.1 0 0 1 3.625 1.188V15.75H19.8a4 4 0 1 0 0 2.5h2.95v23.996A7.17 7.17 0 0 1 18.043 44a7.21 7.21 0 0 1-6.837-4.928l-.375-1.129A7.75 7.75 0 0 1 4 30.25c0-2.026.78-3.87 2.053-5.25H13c.966 0 1.75.784 1.75 1.75v.45a4 4 0 1 0 2.5 0v-.45A4.25 4.25 0 0 0 13 22.5H7.918A7.46 7.46 0 0 1 6 17.5a7.5 7.5 0 0 1 7.003-7.482A6.123 6.123 0 0 1 19.125 4"></path>
-      <path class="glint" pathLength="1" filter="url(#ghost-glow)" style="--i:1" d="M28.875 4a6.123 6.123 0 0 1 6.122 6.018A7.5 7.5 0 0 1 42 17.5a7.48 7.48 0 0 1-2.597 5.67a7.75 7.75 0 0 1-2.234 14.773l-.375 1.13A7.21 7.21 0 0 1 29.957 44c-1.8 0-3.444-.663-4.707-1.754V32.25H29A4.25 4.25 0 0 0 33.25 28v-.201a4 4 0 1 0-2.5 0V28A1.75 1.75 0 0 1 29 29.75h-3.75V5.188A6.1 6.1 0 0 1 28.875 4"></path>
-      <path class="glint" pathLength="1" filter="url(#ghost-glow)" style="--i:2" d="M16 29.5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3"></path>
-      <path class="glint" pathLength="1" filter="url(#ghost-glow)" style="--i:3" d="M32 22.5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3"></path>
-      <path class="glint" pathLength="1" filter="url(#ghost-glow)" style="--i:4" d="M16 15.5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3"></path>
-    </svg>
     <Brand size={40} />
     <div class="words">
       <h1>Brainkeep</h1>
       <p>{t('tagline')}</p>
+      <nav class="links">
+        <a href={SITE} target="_blank" rel="noopener noreferrer">brainkeep.dev</a>
+        <a href={REPO} target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={GITHUB}></path></svg>GitHub</a>
+      </nav>
     </div>
-    <p class="agents">Claude · Codex · Antigravity · claude.ai</p>
+    <ul class="agents">
+      {#each AGENTS as agent}
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d={agent.d}></path></svg>{agent.name}</li>
+      {/each}
+    </ul>
   </section>
 
   <main class="side">
@@ -102,25 +86,18 @@
 <style>
   .login { min-height: 100vh; display: flex; flex-wrap: wrap; }
   .hero { position: relative; overflow: hidden; flex: 1 1 520px; padding: 56px; background: var(--side); display: flex; flex-direction: column;
-    justify-content: space-between; gap: 48px; }
-  .ghost { position: absolute; right: -150px; bottom: -170px; width: 600px; height: 600px; }
-  .ghost path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
-  .ghost .g1 { stop-color: var(--accent); }
-  .ghost .g2 { stop-color: var(--brand-deep); }
-  .ghost .g3 { stop-color: var(--accent-ink); }
-  .ghost .trace { stroke-width: .24; stroke-dasharray: 1.05; stroke-dashoffset: 1.05; animation: ghost-draw 3.2s cubic-bezier(.65, 0, .35, 1) .2s forwards; }
-  .ghost .glint { stroke: var(--accent); stroke-width: .42; stroke-dasharray: .08 .92; stroke-dashoffset: 1; opacity: 0;
-    animation: ghost-glint 7s linear calc(3.2s + var(--i) * .9s) infinite; }
-  @keyframes ghost-draw { 99.9% { stroke-dasharray: 1.05; } to { stroke-dashoffset: 0; stroke-dasharray: none; } }
-  @keyframes ghost-glint { 0% { stroke-dashoffset: 1; opacity: 0; } 8%, 85% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
-  @media (prefers-reduced-motion: reduce) {
-    .ghost .trace { animation: none; stroke-dasharray: none; }
-    .ghost .glint { display: none; }
-  }
+    justify-content: flex-start; gap: 32px; }
   .words { position: relative; display: flex; flex-direction: column; gap: 20px; max-width: 560px; }
   h1 { margin: 0; font: italic 400 84px/1 var(--serif); letter-spacing: -0.02em; }
   .words p { margin: 0; font: 400 26px/1.3 var(--serif); color: var(--ink-2); }
-  .agents { position: relative; margin: 0; font-size: 13px; color: var(--muted); }
+  .links { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; }
+  .links a { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-2); text-decoration: none; }
+  .links a:hover { color: var(--ink); }
+  .links svg { width: 15px; height: 15px; fill: currentColor; }
+  .agents { position: relative; margin: auto 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 10px 22px;
+    font-size: 13px; color: var(--muted); }
+  .agents li { display: flex; align-items: center; gap: 8px; }
+  .agents svg { width: 16px; height: 16px; fill: currentColor; opacity: .9; }
   .side { flex: 1 1 440px; padding: 56px 32px; display: flex; align-items: center; justify-content: center; }
   .box { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 24px; }
   .head { display: flex; flex-direction: column; gap: 6px; }
@@ -143,6 +120,5 @@
     .hero { padding: 32px 24px; gap: 28px; flex-basis: 100%; }
     h1 { font-size: 56px; }
     .words p { font-size: 20px; }
-    .ghost { width: 360px; height: 360px; right: -110px; bottom: -120px; }
   }
 </style>
