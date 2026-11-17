@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<title>Brainkeep share image</title>
+<link rel="stylesheet" href="/assets/tokens.css">
+<style>
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body { box-sizing: border-box; padding: 64px 72px; background: #F9EEF0; color: #1D1519; font-family: 'Inter', sans-serif;
+    display: flex; flex-direction: column; justify-content: space-between; -webkit-font-smoothing: antialiased; }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand svg { width: 44px; height: 44px; fill: #7E2142; }
+  .brand span { font: italic 400 36px/1 'Lora', serif; letter-spacing: -.01em; }
+  h1 { margin: 0; font: 400 92px/1.02 'Lora', serif; letter-spacing: -.02em; }
+  h1 span, h1 em { display: block; }
+  h1 em { color: #7E2142; }
+  .foot { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .kinds { display: flex; gap: 10px; }
+  .kind { display: inline-flex; align-items: center; height: 40px; padding: 0 18px; border-radius: 999px; font-size: 20px; font-weight: 600; }
+  .decision { color: #8E2A4C; background: #FBE9ED; }
+  .discovery { color: #0B5D73; background: #E3F2F5; }
+  .progress { color: #1F6A3B; background: #E8F4EC; }
+  .site { font-size: 24px; font-weight: 600; color: #4E4449; }
+</style>
+</head>
+<body>
+  <div class="brand">
+    <svg viewBox="2 2 44 44" aria-hidden="true"><path d="M19.125 4a6.1 6.1 0 0 1 3.625 1.188V15.75H19.8a4 4 0 1 0 0 2.5h2.95v23.996A7.17 7.17 0 0 1 18.043 44a7.21 7.21 0 0 1-6.837-4.928l-.375-1.129A7.75 7.75 0 0 1 4 30.25c0-2.026.78-3.87 2.053-5.25H13c.966 0 1.75.784 1.75 1.75v.45a4 4 0 1 0 2.5 0v-.45A4.25 4.25 0 0 0 13 22.5H7.918A7.46 7.46 0 0 1 6 17.5a7.5 7.5 0 0 1 7.003-7.482A6.123 6.123 0 0 1 19.125 4m9.75 0a6.123 6.123 0 0 1 6.122 6.018A7.5 7.5 0 0 1 42 17.5a7.48 7.48 0 0 1-2.597 5.67a7.75 7.75 0 0 1-2.234 14.773l-.375 1.13A7.21 7.21 0 0 1 29.957 44c-1.8 0-3.444-.663-4.707-1.754V32.25H29A4.25 4.25 0 0 0 33.25 28v-.201a4 4 0 1 0-2.5 0V28A1.75 1.75 0 0 1 29 29.75h-3.75V5.188A6.1 6.1 0 0 1 28.875 4M16 29.5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3m16-7a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3m-16-7a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3"/></svg>
+    <span>Brainkeep</span>
+  </div>
+  <h1><span>{{hero.h1a}}</span><em>{{hero.h1b}}</em></h1>
+  <div class="foot">
+    <div class="kinds">{% for r in ledger.rows %}<span class="kind {{r.kind}}">{{r.kindLabel}}</span>{% endfor %}</div>
+    <span class="site">brainkeep.dev</span>
+  </div>
+</body>
+</html>

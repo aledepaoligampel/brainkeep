@@ -3,6 +3,7 @@
 import hashlib
 import html
 import importlib.util
+import struct
 import json
 import re
 import subprocess
@@ -31,8 +32,10 @@ class Page(HTMLParser):
         self.inline_scripts = 0
         self.style_tags = 0
         self.title = ""
+        self.data_blocks = []  # JSON-LD text: a data block, not a script the CSP must allow
         self._svg = 0
         self._in_title = False
+        self._in_data = False
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
@@ -40,7 +43,11 @@ class Page(HTMLParser):
         if "id" in a:
             self.ids.append(a["id"])
         if tag == "script" and "src" not in a:
-            self.inline_scripts += 1
+            if a.get("type") == "application/ld+json":
+                self._in_data = True
+                self.data_blocks.append("")
+            else:
+                self.inline_scripts += 1
         if tag == "style":
             self.style_tags += 1
         if tag == "svg":
@@ -56,10 +63,13 @@ class Page(HTMLParser):
         if tag == "svg":
             self._svg -= 1
         self._in_title = False
+        self._in_data = False
 
     def handle_data(self, data):
         if self._in_title:
             self.title += data
+        if self._in_data:
+            self.data_blocks[-1] += data
 
     def find(self, tag, **match):
         out = []
@@ -125,6 +135,34 @@ class SiteTests(unittest.TestCase):
             self.assertEqual({a["hreflang"]: a["href"] for a in switch}, {"en": "/", "es": "/es/"})
             self.assertEqual([a["hreflang"] for a in switch if a.get("aria-current") == "page"], [lang])
 
+    def test_search_and_share_metadata(self):
+        locales = {}
+        for lang, (path, url_path) in PAGES.items():
+            page = parse(path)
+            meta = {a.get("property") or a.get("name"): a.get("content") for a in page.find("meta")}
+            self.assertLessEqual(len(meta["description"]), 160, f"{lang}: description is cut in results")
+            self.assertLessEqual(len(page.title), 60, f"{lang}: title is cut in results")
+            image = meta.get("og:image", "")
+            self.assertEqual(image, f"{ORIGIN}/og-{lang}.png", lang)
+            data = (SITE / f"og-{lang}.png").read_bytes()
+            self.assertEqual(data[:8], b"\x89PNG\r\n\x1a\n", lang)
+            self.assertEqual(struct.unpack(">II", data[16:24]), (1200, 630), f"{lang}: share image size")
+            self.assertEqual((meta.get("og:image:width"), meta.get("og:image:height")), ("1200", "630"), lang)
+            self.assertTrue(meta.get("og:image:alt"), lang)
+            self.assertEqual(meta.get("twitter:card"), "summary_large_image", lang)
+            locales[lang] = (meta["og:locale"], meta.get("og:locale:alternate"))
+            self.assertEqual(len(page.data_blocks), 1, f"{lang}: one JSON-LD block")
+            ld = json.loads(page.data_blocks[0])
+            self.assertEqual(ld["@context"], "https://schema.org")
+            self.assertEqual(ld["@type"], "SoftwareApplication")
+            self.assertEqual(ld["name"], "Brainkeep")
+            self.assertEqual(ld["url"], ORIGIN + url_path)
+            self.assertEqual(ld["inLanguage"], lang)
+            for key in ("description", "applicationCategory", "operatingSystem", "license", "softwareVersion", "offers"):
+                self.assertTrue(ld.get(key), f"{lang}: JSON-LD {key}")
+        self.assertEqual(locales["en"][1], locales["es"][0])
+        self.assertEqual(locales["es"][1], locales["en"][0])
+
     def test_no_remote_resources(self):
         for lang, (path, _) in PAGES.items():
             page = parse(path)
@@ -184,7 +222,7 @@ class SiteTests(unittest.TestCase):
     def test_assets_are_versioned_by_content(self):
         for lang, (path, _) in PAGES.items():
             page = parse(path)
-            refs = [a["href"] for a in page.find("link", rel="stylesheet")] + [a["src"] for a in page.find("script")]
+            refs = [a["href"] for a in page.find("link", rel="stylesheet")] + [a["src"] for a in page.find("script") if "src" in a]
             self.assertTrue(refs, lang)
             for ref in refs:
                 name, _, query = ref.partition("?v=")

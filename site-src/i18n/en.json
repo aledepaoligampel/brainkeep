@@ -1,8 +1,11 @@
 {
   "meta": {
     "title": "Brainkeep — shared memory for AI agents",
-    "description": "Shared, user-controlled memory for AI agents. Claude Code, claude.ai, Codex and any MCP client save and recall the same decisions, discoveries and progress across sessions, tools and people.",
-    "locale": "en_US"
+    "description": "Shared, user-controlled memory for AI agents. Claude Code, Codex and any MCP client keep the same decisions across sessions, tools and people.",
+    "locale": "en_US",
+    "localeAlt": "es_419",
+    "ogAlt": "Brainkeep — Your agents forget. Brainkeep remembers.",
+    "category": "Shared memory server for AI agents (MCP)"
   },
   "nav": {
     "skip": "Skip to content",

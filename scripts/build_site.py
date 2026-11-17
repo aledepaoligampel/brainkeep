@@ -23,6 +23,7 @@ THEME = ROOT / "panel-ui" / "src" / "theme.css"
 FONTS = ROOT / "panel-ui" / "src" / "fonts"
 ICON = ROOT / "panel-ui" / "public" / "icon.svg"
 ORIGIN = "https://brainkeep.dev"
+REPO = "https://github.com/aledepaoligampel/brainkeep"
 LANGS = {"en": "/", "es": "/es/"}
 
 LOOP = re.compile(r"\{%\s*for (\w+) in ([\w.]+)\s*%\}(.*?)\{%\s*endfor\s*%\}", re.S)
@@ -71,10 +72,33 @@ def render(template, ctx, assets):
         key = match.group(1)
         if key.startswith("asset:"):
             return assets[key[6:]]
+        if key.startswith("json:"):
+            # JSON-LD data block: raw JSON; "</" is escaped so no value can close the element.
+            return json.dumps(ctx[key[5:]], ensure_ascii=False).replace("</", "<\\/")
         return html.escape(lookup(ctx, key), quote=True)
 
     out = HOLE.sub(hole, LOOP.sub(loop, template))
     return re.sub(r"\x00(\d+)\x00", lambda m: rendered[int(m.group(1))], out)
+
+
+def structured_data(ctx, lang, path):
+    return {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Brainkeep",
+        "url": ORIGIN + path,
+        "inLanguage": lang,
+        "description": ctx["meta"]["description"],
+        "applicationCategory": "DeveloperApplication",
+        "applicationSubCategory": ctx["meta"]["category"],
+        "operatingSystem": "macOS, Linux",
+        "softwareVersion": version(),
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+        "license": "https://opensource.org/licenses/MIT",
+        "image": f"{ORIGIN}/og-{lang}.png",
+        "downloadUrl": REPO + "/releases",
+        "sameAs": REPO,
+    }  # a nested object stays in the middle: the page must never contain the template markers "{{" or "}}"
 
 
 def outputs():
@@ -90,7 +114,7 @@ def outputs():
     template = (SRC / "index.html").read_text(encoding="utf-8")
     for lang, path in LANGS.items():
         ctx = json.loads((SRC / "i18n" / f"{lang}.json").read_text(encoding="utf-8"))
-        ctx.update(lang=lang, path=path, origin=ORIGIN, version=version(),
+        ctx.update(lang=lang, path=path, origin=ORIGIN, version=version(), ld=structured_data(ctx, lang, path),
                    langs=[{"code": code, "href": href, "label": code.upper(),
                            "current": "page" if code == lang else "false"} for code, href in LANGS.items()])
         page = render(template, ctx, assets)

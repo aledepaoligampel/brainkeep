@@ -70,6 +70,7 @@ The plugin does not configure the MCP server; connect it first. Details:
 ./scripts/check-database.sh   # storage and migration tests
 cd panel-ui && npm ci --ignore-scripts && npx vite build   # rebuild the web panel
 python3 scripts/build_site.py # regenerate the brainkeep.dev landing in site/
+python3 scripts/og_images.py  # re-render its share images (needs Chrome)
 ```
 
 The landing (`site/`, served as plain files) is generated from `site-src/` and reuses the
