@@ -32,7 +32,11 @@ const BODY_TIMEOUT: Duration = Duration::from_secs(5);
 /// Largest edit body: 16 KiB of content plus the other fields, JSON-escaped.
 const EDIT_BODY: usize = 64 * 1024;
 /// Store messages an edit may show as-is: they describe the user's own input.
-const EDIT_MESSAGES: [&str; 13] = [
+const EDIT_MESSAGES: [&str; 17] = [
+    brainkeep::store::TOKEN_TOO_SOON,
+    brainkeep::store::TOKEN_SESSION,
+    brainkeep::store::USER_HAS_DATA,
+    brainkeep::store::ADMIN_NO_PERSONAL,
     "secret rejected; nothing saved",
     "topic is stable; create a separate memory for a new subject",
     "invalid email or handle",
@@ -48,8 +52,9 @@ const EDIT_MESSAGES: [&str; 13] = [
     "user already exists and is enabled",
 ];
 /// Panel writes: memory edits, sharing (owners) and user administration (admin only).
-const WRITES: [&str; 9] = [
+const WRITES: [&str; 11] = [
     "correct", "archive", "purge", "share", "unshare", "invite", "disable", "enable", "token",
+    "my_token", "delete",
 ];
 /// Live-update streams: comment every 30 s keeps proxies (Cloudflare: 100 s idle) open.
 const KEEPALIVE: Duration = Duration::from_secs(30);

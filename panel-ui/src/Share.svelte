@@ -185,7 +185,7 @@
   .members li { display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 14px; border-bottom: 1px solid var(--line); }
   .members li:last-child { border-bottom: 0; }
   .who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-  .name { font: 500 15px/1.25 var(--serif); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .name { font: 600 14px/1.25 var(--sans); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .handle { font-size: 12px; }
   .handle.solo { font-size: 14px; color: var(--ink); }
   @media (max-width: 560px) {

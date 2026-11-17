@@ -28,7 +28,7 @@ const SCHEMA_VERSION: i64 = 7;
 /// Prefix of personal tokens issued from the panel (`sbp_` + 64 hex).
 pub const PERSONAL_PREFIX: &str = "sbp_";
 /// Panel administration answers for sessions that are not the admin: like a missing view.
-const ADMIN_VIEWS: [&str; 5] = ["users", "invite", "disable", "enable", "token"];
+const ADMIN_VIEWS: [&str; 6] = ["users", "invite", "disable", "enable", "token", "delete"];
 /// Principal prefix of panel sessions (`panel:<session hash>`); `:` is invalid in
 /// credential names and OAuth principals start with `oauth-`.
 pub const PANEL_PRINCIPAL: &str = "panel:";
@@ -59,6 +59,20 @@ const PANEL_EDIT_FIELDS: [&str; 9] = [
 /// URIs, so it can never complete an authorization, and its rows never act as bearers.
 const PANEL_CLIENT: &str = "brainkeep-panel-sessions";
 const PANEL_TTL: i64 = 30 * 86400;
+pub const TOKEN_TOO_SOON: &str = "token was just issued; try again in a minute";
+pub const ADMIN_NO_PERSONAL: &str = "the admin has no personal token";
+pub const USER_HAS_DATA: &str = "user has memories or edits; disable instead";
+/// SQL: whether user `u` left anything behind: rows under their project keys (memories,
+/// members of their shared projects, archive counters, purge records), revisions they wrote
+/// or purges they made. Any of these would be orphaned, or inherited by a re-invited handle.
+const HAS_DATA: &str = "(EXISTS(SELECT 1 FROM memories m WHERE substr(m.project,1,length(u.handle)+1)=u.handle||'/') \
+     OR EXISTS(SELECT 1 FROM project_members pm WHERE substr(pm.project,1,length(u.handle)+1)=u.handle||'/') \
+     OR EXISTS(SELECT 1 FROM project_changes c WHERE substr(c.project,1,length(u.handle)+1)=u.handle||'/') \
+     OR EXISTS(SELECT 1 FROM purges g WHERE substr(g.project,1,length(u.handle)+1)=u.handle||'/' OR g.purged_by=u.handle) \
+     OR EXISTS(SELECT 1 FROM revisions r WHERE r.principal=u.handle))";
+pub const TOKEN_SESSION: &str = "sign in with Google to issue a new token";
+/// A signed-in user may replace their own personal token at most this often.
+const SELF_ISSUE_INTERVAL: Duration = Duration::from_secs(60);
 
 pub struct Store {
     db: Connection,
@@ -67,6 +81,8 @@ pub struct Store {
     /// Changes since the last `take_changes` (live panel): (internal key, membership).
     /// Membership changes alter who sees what; `*` means any project may be affected.
     changed: Vec<(String, bool)>,
+    /// Last self-issued personal token per handle (process lifetime; see `my_token`).
+    self_issued: std::collections::HashMap<String, std::time::Instant>,
 }
 impl Store {
     pub fn open(dir: &Path) -> Result<Self> {
@@ -176,6 +192,7 @@ impl Store {
             _lock: lock,
             owner: stored,
             changed: Vec::new(),
+            self_issued: std::collections::HashMap::new(),
         })
     }
     /// Internal key for a caller-facing project name in the caller's namespace.
@@ -612,6 +629,47 @@ impl Store {
                 return Ok(
                     json!({"name":name,"picture":picture,"email":email,"admin":me == self.owner}),
                 );
+            }
+            // A signed-in user's own personal token (never the read key): replaces the
+            // previous one, so agents and panel sessions that used it must be updated.
+            if view == "my_token" {
+                if access.is_local() {
+                    return Err(access::DENIED.into());
+                }
+                allowed(&args, &[])?;
+                if me == self.owner {
+                    return Err(ADMIN_NO_PERSONAL.into());
+                }
+                // A session opened with the personal token belongs to its family and would end
+                // with it, before the new token could be copied.
+                let session = access
+                    .principal()
+                    .strip_prefix(PANEL_PRINCIPAL)
+                    .unwrap_or("");
+                let by_token: bool = self
+                    .db
+                    .query_row(
+                        "SELECT EXISTS(SELECT 1 FROM oauth_tokens t JOIN personal_tokens p ON p.hash=t.family \
+                         JOIN users u ON u.id=p.user_id WHERE t.hash=?1 AND u.handle=?2)",
+                        params![session, me],
+                        |r| r.get(0),
+                    )
+                    .map_err(|_| DB_ERROR)?;
+                if by_token {
+                    return Err(TOKEN_SESSION.into());
+                }
+                if self
+                    .self_issued
+                    .get(&me)
+                    .is_some_and(|t| t.elapsed() < SELF_ISSUE_INTERVAL)
+                {
+                    return Err(TOKEN_TOO_SOON.into());
+                }
+                let token = self.reissue(&me, access::INACTIVE)?;
+                self.self_issued
+                    .insert(me.clone(), std::time::Instant::now());
+                self.changed.push(("*".into(), true));
+                return Ok(json!({"handle":me,"token":token}));
             }
             // User administration: only a signed-in admin session (Google or admin key).
             // The read key stays read-only; anyone else sees no such views.
@@ -1418,9 +1476,11 @@ impl Store {
                 let mut stmt = self
                     .db
                     .prepare(
-                        "SELECT u.handle,u.email,u.name,u.picture,u.admin,u.disabled,u.created_at,\
-                         p.user_id IS NOT NULL,u.google_sub IS NOT NULL OR coalesce(p.used,0)=1 \
-                         FROM users u LEFT JOIN personal_tokens p ON p.user_id=u.id ORDER BY u.admin DESC,u.handle",
+                        &format!(
+                            "SELECT u.handle,u.email,u.name,u.picture,u.admin,u.disabled,u.created_at,\
+                             p.user_id IS NOT NULL,u.google_sub IS NOT NULL OR coalesce(p.used,0)=1,{HAS_DATA} \
+                             FROM users u LEFT JOIN personal_tokens p ON p.user_id=u.id ORDER BY u.admin DESC,u.handle"
+                        ),
                     )
                     .map_err(|_| DB_ERROR)?;
                 let users = stmt
@@ -1429,7 +1489,7 @@ impl Store {
                             "name":r.get::<_,Option<String>>(2)?,"picture":r.get::<_,Option<String>>(3)?,
                             "admin":r.get::<_,bool>(4)?,"disabled":r.get::<_,bool>(5)?,
                             "created_at":r.get::<_,String>(6)?,"has_token":r.get::<_,bool>(7)?,
-                            "signed_in":r.get::<_,bool>(8)?}))
+                            "signed_in":r.get::<_,bool>(8)?,"has_data":r.get::<_,bool>(9)?}))
                     })
                     .map_err(|_| DB_ERROR)?
                     .collect::<rusqlite::Result<Vec<_>>>()
@@ -1485,6 +1545,41 @@ impl Store {
             "disable" => {
                 allowed(args, &["handle"])?;
                 self.users("disable", args)
+            }
+            // Only users who never stored anything: their rows go, nothing else changes.
+            // Users with data are disabled instead, so history keeps its authors.
+            "delete" => {
+                const NOT_FOUND: &str = "user not found or is the admin";
+                allowed(args, &["handle"])?;
+                let handle = text(args, "handle", 32).map_err(|_| NOT_FOUND.to_string())?;
+                let tx = self
+                    .db
+                    .transaction_with_behavior(TransactionBehavior::Immediate)
+                    .map_err(|_| DB_ERROR)?;
+                let found: Option<(i64, bool)> = tx
+                    .query_row(
+                        &format!(
+                            "SELECT u.id,{HAS_DATA} FROM users u WHERE u.handle=?1 AND u.admin=0"
+                        ),
+                        [&handle],
+                        |r| Ok((r.get(0)?, r.get(1)?)),
+                    )
+                    .optional()
+                    .map_err(|_| DB_ERROR)?;
+                let Some((id, has_data)) = found else {
+                    return Err(NOT_FOUND.into());
+                };
+                if has_data {
+                    return Err(USER_HAS_DATA.into());
+                }
+                for table in ["oauth_tokens", "personal_tokens", "project_members"] {
+                    tx.execute(&format!("DELETE FROM {table} WHERE user_id=?1"), [id])
+                        .map_err(|_| DB_ERROR)?;
+                }
+                tx.execute("DELETE FROM users WHERE id=?1", [id])
+                    .map_err(|_| DB_ERROR)?;
+                tx.commit().map_err(|_| DB_ERROR)?;
+                Ok(json!({"handle":handle,"deleted":true}))
             }
             "enable" => {
                 allowed(args, &["handle"])?;

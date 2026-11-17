@@ -178,6 +178,79 @@ class Admin(base.PanelGoogle):
             self.assertNotIn(token.encode(), data)
             self.assertNotIn(token[4:].encode(), data)
 
+    def test_users_issue_their_own_token(self):
+        admin = self.admin_session()
+        first = self.invite(admin, 'lia@example.test', 'lia')
+        # A session opened with the token cannot rotate it: the session would end with the
+        # old token before the new one could be copied.
+        by_token = self.login(first)[1]
+        status, reply = self.post(by_token, 'my_token', {})
+        self.assertEqual((status, reply['error']), (400, 'sign in with Google to issue a new token'))
+        self.assertEqual(self.mcp_status(first), 200)
+        if not self.oauth:
+            return
+        # From a Google session: a new token, the old one stops working, the session stays.
+        lia = self.google_session('lia@example.test')
+        status, reply = self.post(lia, 'my_token', {})
+        self.assertEqual(status, 200, reply)
+        second = reply['token']
+        self.assertRegex(second, PERSONAL)
+        self.assertNotEqual(first, second)
+        self.assertEqual((self.mcp_status(first), self.mcp_status(second)), (401, 200))
+        self.assertEqual(self.get(lia, 'status')[0], 200)
+        # Once a minute at most, so a stolen session cannot churn tokens.
+        status, reply = self.post(lia, 'my_token', {})
+        self.assertEqual((status, reply['error']), (400, 'token was just issued; try again in a minute'))
+        self.assertEqual(self.mcp_status(second), 200)
+        # Unknown fields, the read key, no session, no CSRF token or another origin: no token.
+        self.assertEqual(self.post(lia, 'my_token', {'handle': 'ana'})[0], 400)
+        self.assertEqual(self.post(self.read_key_session(), 'my_token', {})[0], 403)
+        self.assertEqual(self.post('', 'my_token', {}, csrf=None)[0], 401)
+        self.assertEqual(self.post(lia, 'my_token', {}, csrf=None)[0], 403)
+        self.assertEqual(self.post(lia, 'my_token', {}, origin='https://evil.example.test')[0], 403)
+        # The admin connects with OAuth or fixed tokens, not a personal one.
+        status, reply = self.post(admin, 'my_token', {})
+        self.assertEqual((status, reply['error']), (400, 'the admin has no personal token'))
+
+    def test_admin_deletes_only_users_without_data(self):
+        admin = self.admin_session()
+        tomi = self.invite(admin, 'tomi@example.test', 'tomi')
+        rosa = self.invite(admin, 'rosa@example.test', 'rosa')
+        ivo = self.invite(admin, 'ivo@example.test', 'ivo')
+        self.remember(rosa, 'propio', 'rosa memory')
+        # Ivo owns nothing but wrote into a project shared with him.
+        self.tool(base.ADMIN, 'share', {'project': 'secreto', 'email': 'ivo@example.test', 'role': 'write'})
+        self.remember(ivo, 'owner/secreto', 'ivo wrote here')
+        self.tool(base.ADMIN, 'share', {'project': 'secreto', 'email': 'tomi@example.test', 'role': 'read'})
+        # Pia saved, shared, archived and purged: her project still has members and a purge
+        # record, so deleting her would orphan rows (and stop the next start).
+        pia = self.invite(admin, 'pia@example.test', 'pia')
+        saved = self.tool(pia, 'remember', {'project': 'borrador', 'content': 'pia memory', 'kind': 'note',
+                                            'title': 'pia', 'source': 'test', 'agent': 'test',
+                                            'operation_id': 'pia-op-0001'})
+        self.tool(pia, 'share', {'project': 'borrador', 'email': 'tomi@example.test', 'role': 'read'})
+        pia_panel = self.login(pia)[1]
+        target = {'project': 'borrador', 'id': saved['id']}
+        self.assertEqual(self.post(pia_panel, 'archive', {**target, 'archived': True})[0], 200)
+        self.assertEqual(self.post(pia_panel, 'purge', {**target, 'confirm': 'purgar'})[0], 200)
+        users = self.handles(admin)
+        self.assertEqual({h: users[h]['has_data'] for h in ('tomi', 'rosa', 'ivo', 'pia')},
+                         {'tomi': False, 'rosa': True, 'ivo': True, 'pia': True})
+        for handle in ('rosa', 'ivo', 'pia'):
+            status, reply = self.post(admin, 'delete', {'handle': handle})
+            self.assertEqual((status, reply['error']), (400, 'user has memories or edits; disable instead'), handle)
+        for handle in ('owner', 'nadie'):
+            status, reply = self.post(admin, 'delete', {'handle': handle})
+            self.assertEqual((status, reply['error']), (400, 'user not found or is the admin'), handle)
+        status, reply = self.post(admin, 'delete', {'handle': 'tomi'})
+        self.assertEqual((status, reply), (200, {'handle': 'tomi', 'deleted': True}))
+        self.assertEqual(self.mcp_status(tomi), 401)
+        self.assertNotIn('tomi', self.handles(admin))
+        self.assertEqual((self.mcp_status(rosa), self.mcp_status(ivo)), (200, 200))
+        # The email and handle are free again.
+        self.assertEqual(self.mcp_status(self.invite(admin, 'tomi@example.test', 'tomi')), 200)
+        self.assertFalse(self.handles(admin)['tomi']['has_data'])
+
     def test_only_the_admin_reaches_user_administration(self):
         admin = self.admin_session()
         ana_token = self.invite(admin, 'eva@example.test', 'eva')
@@ -187,7 +260,8 @@ class Admin(base.PanelGoogle):
         # A non-admin session gets 404 as if the views did not exist.
         self.assertEqual(self.get(eva, 'users')[0], 404)
         for view, body in (('invite', {'email': 'x@example.test', 'handle': 'x'}), ('disable', {'handle': 'ana'}),
-                           ('enable', {'handle': 'ana'}), ('token', {'handle': 'ana'})):
+                           ('enable', {'handle': 'ana'}), ('token', {'handle': 'ana'}),
+                           ('delete', {'handle': 'ana'})):
             self.assertEqual(self.post(eva, view, body)[0], 404, view)
             # No session, no CSRF token, a foreign token or another origin: no effect.
             self.assertEqual(self.post('', view, body, csrf=None)[0], 401, view)

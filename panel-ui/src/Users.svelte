@@ -3,6 +3,8 @@
   // personal token. A token is shown once, in the dialog that follows the action.
   import { onMount } from 'svelte';
   import { DropdownMenu, Dialog, AlertDialog } from 'bits-ui';
+  import { inviteMessage } from './lib/invite.js';
+  import PageHeader from './lib/PageHeader.svelte';
   import Person from './lib/Person.svelte';
   import { app, t, api, send, stamp } from './lib/state.svelte.js';
 
@@ -88,7 +90,7 @@
   async function confirmed() {
     const { kind, user } = confirm;
     working = true; problem = '';
-    const r = await send(kind === 'disable' ? 'disable' : 'token', { handle: user.handle });
+    const r = await send(kind === 'regenerate' ? 'token' : kind, { handle: user.handle });
     working = false;
     if (!r.ok) { problem = serverError(r.body); return; }
     confirmOpen = false;
@@ -99,6 +101,7 @@
   function show(kind, body) {
     issued = { kind, handle: body.handle, email: body.email, token: body.token };
     copied = '';
+    revealed = false;
     issuedOpen = true;
   }
   function closeIssued(open) {
@@ -106,9 +109,12 @@
     if (!open) issued = null;
   }
 
+  // With Google the invitation needs no token: the person signs in and connects each agent
+  // with OAuth from "Connect agents". The token stays here, hidden, for when Google is not an option.
+  const viaGoogle = $derived(Boolean(issued && app.google && issued.email));
+  let revealed = $state(false);
   const message = $derived(issued
-    ? t('inviteMessage', location.origin + '/panel/', location.origin + '/mcp', issued.token)
-      + (app.google && issued.email ? t('inviteMessageGoogle', issued.email) : t('inviteMessageToken'))
+    ? inviteMessage(t, location.origin, { google: app.google, email: issued.email, token: issued.token })
     : '');
   async function copy(text, key) {
     try { await navigator.clipboard.writeText(text); copied = key; setTimeout(() => { if (copied === key) copied = ''; }, 2000); }
@@ -118,19 +124,15 @@
   const filters = ['all', 'active', 'pending', 'disabled'];
 </script>
 
-<section class="users" aria-labelledby="users-title">
-  <header class="head">
-    <div class="intro">
-      <div class="title">
-        <h1 id="users-title" class="serif">{t('users')}</h1>
-        {#if users}<span class="muted">{t(users.length === 1 ? 'people1' : 'people', users.length)}</span>{/if}
-      </div>
-      <p>{t('usersHelp')}</p>
-    </div>
-    <button type="button" class="btn primary tall" onclick={openInvite}>
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>{t('invitePerson')}
-    </button>
-  </header>
+<section class="page users" aria-labelledby="users-title">
+  <PageHeader id="users-title" title={t('users')} description={t('usersHelp')}
+    count={users ? t(users.length === 1 ? 'people1' : 'people', users.length) : ''}>
+    {#snippet actions()}
+      <button type="button" class="btn primary tall" onclick={openInvite}>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>{t('invitePerson')}
+      </button>
+    {/snippet}
+  </PageHeader>
 
   {#if !app.google}
     <p class="notice" role="note">
@@ -187,15 +189,27 @@
                         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"></circle><path d="m11 12 9-9M17 6l3 3M15 8l2 2"></path></svg>{t('regenerate')}
                       </DropdownMenu.Item>
                     {/if}
+                    {#if app.google && u.email && !u.disabled}
+                      <!-- With Google the invitation has no token, so it can be copied again at any time. -->
+                      <DropdownMenu.Item class="menu-item" onSelect={() => copy(inviteMessage(t, location.origin, { google: true, email: u.email }), 'invite')}>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4z"></path><path d="m4 7 8 6 8-6"></path></svg>{t('copyInvite')}
+                      </DropdownMenu.Item>
+                    {/if}
                     {#if u.email}
                       <DropdownMenu.Item class="menu-item" onSelect={() => copy(u.email, 'email')}>
                         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path></svg>{t('copyEmail')}
                       </DropdownMenu.Item>
                     {/if}
+                    {#if !u.disabled || (!u.has_data && !u.admin)}<div class="menu-sep"></div>{/if}
                     {#if !u.disabled}
-                      <div class="menu-sep"></div>
                       <DropdownMenu.Item class="menu-item danger" onSelect={() => ask('disable', u)}>
                         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M5.6 5.6l12.8 12.8"></path></svg>{t('disable')}
+                      </DropdownMenu.Item>
+                    {/if}
+                    {#if !u.has_data && !u.admin}
+                      <!-- Only people who never stored anything; the others are disabled instead. -->
+                      <DropdownMenu.Item class="menu-item danger" onSelect={() => ask('delete', u)}>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg>{t('deleteUser')}
                       </DropdownMenu.Item>
                     {/if}
                   </DropdownMenu.Content>
@@ -246,6 +260,10 @@
   </Dialog.Portal>
 </Dialog.Root>
 
+{#if copied === 'invite' || copied === 'email'}
+  <p class="toast" role="status">{t(copied === 'invite' ? 'inviteCopied' : 'emailCopied')}</p>
+{/if}
+
 <Dialog.Root bind:open={issuedOpen} onOpenChange={closeIssued}>
   <Dialog.Portal>
     <Dialog.Overlay class="dialog-overlay" />
@@ -257,6 +275,10 @@
         </div>
         <div class="field">
           <span class="label">{t('personalToken')}</span>
+          {#if viaGoogle && !revealed}
+            <p class="field-help">{t('tokenOptional')}</p>
+            <button type="button" class="btn reveal" onclick={() => (revealed = true)}>{t('showToken')}</button>
+          {:else}
           <div class="secret">
             <code>{issued.token}</code>
             <button type="button" class="btn" onclick={() => copy(issued.token, 'token')}>
@@ -268,6 +290,7 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16.5v.01"></path></svg>
             <span>{t('tokenOnce')}</span>
           </Dialog.Description>
+          {/if}
         </div>
         <div class="field">
           <span class="label">{t('messageTitle')}</span>
@@ -280,7 +303,7 @@
           </button>
           <Dialog.Close class="btn tall">{t('done')}</Dialog.Close>
         </div>
-        <p class="field-help">{t('privateChannel', issued.handle)}</p>
+        <p class="field-help">{viaGoogle ? t('privateChannelGoogle', issued.handle) : t('privateChannel', issued.handle)}</p>
       {/if}
     </Dialog.Content>
   </Dialog.Portal>
@@ -295,17 +318,21 @@
           <span class="badge-icon danger" aria-hidden="true">
             {#if confirm.kind === 'disable'}
               <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M5.6 5.6l12.8 12.8"></path></svg>
+            {:else if confirm.kind === 'delete'}
+              <svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg>
             {:else}
               <svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"></circle><path d="m11 12 9-9M17 6l3 3M15 8l2 2"></path></svg>
             {/if}
           </span>
           <AlertDialog.Title class="modal-title">
-            {t(confirm.kind === 'disable' ? 'disableTitle' : 'regenTitle', confirm.user.handle)}
+            {t({ disable: 'disableTitle', delete: 'deleteTitle', regenerate: 'regenTitle' }[confirm.kind], confirm.user.handle)}
           </AlertDialog.Title>
         </div>
         <AlertDialog.Description class="modal-desc stack">
           {#if confirm.kind === 'disable'}
             {#each t('disableHelp') as line}<span>{line}</span>{/each}
+          {:else if confirm.kind === 'delete'}
+            <span>{t('deleteHelp')}</span>
           {:else}
             <span>{t('regenHelp')}</span>
           {/if}
@@ -314,7 +341,7 @@
         <div class="modal-actions">
           <AlertDialog.Cancel class="btn tall">{t('cancel')}</AlertDialog.Cancel>
           <button type="button" class="btn danger solid tall" disabled={working} onclick={confirmed}>
-            {confirm.kind === 'disable' ? t('disable') : t('regenerate')}
+            {t({ disable: 'disable', delete: 'deleteUser', regenerate: 'regenerate' }[confirm.kind])}
           </button>
         </div>
       {/if}
@@ -323,13 +350,10 @@
 </AlertDialog.Root>
 
 <style>
-  .users { min-width: 0; padding: 32px 40px; display: flex; flex-direction: column; gap: 20px; }
-  .head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; }
-  .intro { display: flex; flex-direction: column; gap: 6px; max-width: 640px; }
-  .intro p { margin: 0; color: var(--ink-2); }
-  .title { display: flex; align-items: baseline; gap: 12px; }
-  h1 { margin: 0; font-size: 38px; line-height: 1.05; letter-spacing: -0.015em; }
-  .head svg, .notice svg, .act svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .reveal { align-self: flex-start; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 60; margin: 0; padding: 10px 16px;
+    border-radius: 999px; background: var(--ink); color: var(--bg); font-size: 13px; box-shadow: var(--shadow); }
+  .notice svg, .act svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .act svg.dots { fill: currentColor; stroke: none; }
   .notice { margin: 0; display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; border-radius: 14px; background: var(--warn-soft);
     border: 1px solid var(--warn-line); color: var(--warn); font-size: 13px; }
@@ -352,7 +376,7 @@
   .row.header { padding-top: 12px; padding-bottom: 12px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
   .person { display: flex; align-items: center; gap: 12px; min-width: 0; }
   .who { display: flex; flex-direction: column; min-width: 0; }
-  .name { font: 500 15px/1.25 var(--serif); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .name { font: 600 14px/1.25 var(--sans); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .off .name { color: var(--muted); }
   .sub { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .handle { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; }
@@ -372,9 +396,6 @@
   :global(.modal-actions.start) { justify-content: flex-start; }
   :global(.modal-desc.stack) { display: flex; flex-direction: column; gap: 8px; }
   @media (max-width: 900px) {
-    .users { padding: 20px 16px; }
-    h1 { font-size: 30px; }
-    .head .btn { width: 100%; }
     .row.header { display: none; }
     .row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'person act' 'meta meta'; gap: 8px 12px; padding: 12px 8px 12px 14px; }
     .person { grid-area: person; }

@@ -50,6 +50,7 @@ export function parseRoute() {
   const params = new URLSearchParams(query);
   const filters = Object.fromEntries(FILTERS.map((n) => [n, params.get(n) || '']));
   if (parts[0] === 'users') return { project: '', id: null, filters, scoped: false, users: true };
+  if (parts[0] === 'connect') return { project: '', id: null, filters, scoped: false, connect: true };
   if (parts[0] === 'm' && parts[1] && parts[2]) return { project: parts[1], id: parts[2], filters, scoped: params.get('in') === '1' };
   if (parts[0] === 'p' && parts[1]) return { project: parts[1], id: null, filters, scoped: true };
   return { project: '', id: null, filters, scoped: false };

@@ -28,12 +28,12 @@
 
   <div class="lists">
   <div class="group">
-    <a class="nav" class:on={!app.route.scoped && !app.route.users && !app.route.filters.archived} href={listHref('', {})}>
+    <a class="nav" class:on={!app.route.scoped && !app.route.users && !app.route.connect && !app.route.filters.archived} href={listHref('', {})}>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>{t('memories')}
       {#if app.status}<span class="count">{app.status.memories}</span>{/if}
     </a>
     {#if app.status?.archived || app.route.filters.archived}
-      <a class="nav" class:on={!app.route.scoped && !app.route.users && app.route.filters.archived} href={listHref('', { archived: '1' })}>
+      <a class="nav" class:on={!app.route.scoped && !app.route.users && !app.route.connect && app.route.filters.archived} href={listHref('', { archived: '1' })}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1.5"></rect><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4"></path></svg>{t('archived')}
         <span class="count">{app.status?.archived || 0}</span>
       </a>
@@ -61,6 +61,12 @@
       {/each}
     </div>
   {/if}
+
+  <div class="group">
+    <a class="nav" class:on={app.route.connect} href="#/connect" aria-current={app.route.connect ? 'page' : undefined}>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7V3M15 7V3M7 7h10v4a5 5 0 0 1-10 0V7ZM12 16v5"></path></svg>{t('connect')}
+    </a>
+  </div>
 
   {#if app.session?.admin}
     <div class="group">
@@ -172,11 +178,11 @@
   .me :global(.me-row:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
   .avatar { position: relative; width: 36px; height: 36px; flex: 0 0 auto; border-radius: 50%; background: var(--brand);
     box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--brand-deep); display: inline-flex; align-items: center; justify-content: center;
-    font: italic 400 20px var(--serif); color: #5E1F37; text-transform: lowercase; }
+    font: 600 16px var(--sans); color: #5E1F37; text-transform: uppercase; }
   .avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
   .avatar .live-dot { position: absolute; right: -1px; bottom: -1px; width: 11px; height: 11px; border: 2px solid var(--surface); }
   .who { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-  .handle { font: 500 15px/1.2 var(--serif); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .handle { font: 600 14px/1.2 var(--sans); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .tag { font-size: 11px; line-height: 1; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   :global(.menu) .kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 4px 10px 6px; font-size: 12px; }
   :global(.menu) .kv dt { color: var(--muted); }

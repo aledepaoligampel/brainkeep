@@ -1,6 +1,8 @@
 // Pure rendering rules of the panel (S4, S5). Run: node tests/panel_render.mjs
 import assert from 'node:assert/strict';
 import { parseMarkdown, lineDiff, safeHref, author } from '../panel-ui/src/lib/markdown.js';
+import { inviteMessage } from '../panel-ui/src/lib/invite.js';
+import { I18N } from '../panel-ui/src/lib/i18n.js';
 
 const ALLOWED = new Set(['p', 'h', 'ul', 'ol', 'li', 'pre', 'text', 'strong', 'em', 'code', 'a', 'br']);
 function walk(node, visit) {
@@ -78,5 +80,18 @@ assert.equal(d.filter((x) => x.op !== ' ').length, 2);
 assert.equal(author({ principal: 'ana', agent: 'codex' }), 'ana');
 assert.equal(author({ principal: null, agent: 'codex' }), '—');
 assert.equal(author({ agent: 'codex' }), '—');
+
+// Invitations (conectar-agentes S1): with Google the text carries no token.
+const TOKEN = 'sbp_' + 'a'.repeat(64);
+for (const lang of ['es', 'en']) {
+  const t = (key, ...args) => I18N[lang][key].replace(/\{(\d)\}/g, (_, i) => args[i]);
+  const google = inviteMessage(t, 'https://m.example.test', { google: true, email: 'ana@example.test', token: TOKEN });
+  assert.ok(!google.includes('sbp_'), google);
+  assert.ok(google.includes('ana@example.test') && google.includes('https://m.example.test/panel/#/connect'), google);
+  for (const fallback of [{ google: false, email: 'ana@example.test' }, { google: true, email: null }]) {
+    const text = inviteMessage(t, 'https://m.example.test', { ...fallback, token: TOKEN });
+    assert.ok(text.includes(TOKEN) && text.includes('https://m.example.test/mcp'), text);
+  }
+}
 
 console.log('panel_render: ok');

@@ -1,4 +1,5 @@
-//! OAuth 2.1 authorization server for remote MCP clients (claude.ai web and mobile).
+//! OAuth 2.1 authorization server for remote MCP clients (claude.ai, ChatGPT, Antigravity and
+//! local CLIs such as Claude Code and Codex).
 //! Brainkeep issues its own tokens; Google OIDC only proves the user's email. Pending logins
 //! and authorization codes live in memory (a restart only interrupts in-flight logins);
 //! clients and tokens persist in the store as SHA-256 hashes.
@@ -184,10 +185,11 @@ fn pkce_value(v: &str) -> bool {
 }
 /// HTTPS callbacks of the remote MCP clients Brainkeep serves. Registration is open, so any
 /// other HTTPS destination would let a stranger's client receive a victim's code.
-const ALLOWED_REDIRECTS: [&str; 3] = [
+const ALLOWED_REDIRECTS: [&str; 4] = [
     "https://claude.ai/api/mcp/auth_callback",
     "https://claude.com/api/mcp/auth_callback",
     "https://chatgpt.com/connector_platform_oauth_redirect",
+    "https://antigravity.google/oauth-callback",
 ];
 /// ChatGPT's per-connector callback: this prefix plus one opaque path segment.
 const CHATGPT_CALLBACK: &str = "https://chatgpt.com/connector/oauth/";
@@ -1008,6 +1010,7 @@ mod tests {
             "https://claude.com/api/mcp/auth_callback",
             "https://chatgpt.com/connector_platform_oauth_redirect",
             "https://chatgpt.com/connector/oauth/Ab_9-x",
+            "https://antigravity.google/oauth-callback",
             "http://127.0.0.1:3000/cb",
             "http://localhost/cb",
             "http://[::1]:8080/cb",
@@ -1019,6 +1022,8 @@ mod tests {
             "https://evil.test/cb",
             "https://claude.ai/api/mcp/auth_callback?x=1",
             "https://claude.ai.evil.test/api/mcp/auth_callback",
+            "https://antigravity.google/oauth-callback/x",
+            "https://antigravity.google.evil.test/oauth-callback",
             "https://chatgpt.com/connector/oauth/",
             "https://chatgpt.com/connector/oauth/a/b",
             "https://",

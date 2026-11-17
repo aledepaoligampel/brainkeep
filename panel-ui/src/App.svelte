@@ -5,6 +5,7 @@
   import MemoryList from './MemoryList.svelte';
   import MemoryDetail from './MemoryDetail.svelte';
   import Users from './Users.svelte';
+  import Connect from './Connect.svelte';
   import Palette from './Palette.svelte';
   import { app, t, boot, applyTheme } from './lib/state.svelte.js';
   import { connect, disconnect } from './lib/live.js';
@@ -39,9 +40,11 @@
 {:else}
   <div class="shell" class:has-detail={Boolean(app.route.id)}>
     <aside class="nav-col"><Sidebar onsearch={() => (palette = true)} /></aside>
-    <main class="main" class:wide={app.route.users}>
+    <main class="main" class:wide={app.route.users || app.route.connect}>
       {#if app.route.users}
         <Users />
+      {:else if app.route.connect}
+        <Connect />
       {:else}
       <div class="list-col"><MemoryList /></div>
       <div class="detail-col">
