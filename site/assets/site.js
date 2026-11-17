@@ -52,4 +52,34 @@
       }, function () { /* clipboard denied: the commands stay selectable */ });
     });
   });
+
+  // Hero screenshot: tilted back while the page is at the top, flat once half of it is in view
+  // (or after half a screen of scroll, whichever is later).
+  var shot = document.querySelector('.hero-shot');
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (shot && !still) {
+    var flatAt = 1;
+    var queued = false;
+    var measure = function () {
+      // Layout offsets ignore the transform, so the tilt never changes its own measurement.
+      var top = 0;
+      for (var el = shot; el; el = el.offsetParent) top += el.offsetTop;
+      // At least half a screen of scroll, so the tilt eases out gradually even when it starts mostly in view.
+      flatAt = Math.max(window.innerHeight / 2, top + shot.offsetHeight / 2 - window.innerHeight);
+    };
+    var update = function () {
+      queued = false;
+      var p = Math.min(1, Math.max(0, window.scrollY / flatAt));
+      var eased = 1 - p * p * (3 - 2 * p);
+      shot.style.setProperty('--tilt', eased.toFixed(3));
+    };
+    var queue = function () {
+      if (!queued) { queued = true; window.requestAnimationFrame(update); }
+    };
+    measure();
+    update();
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', function () { measure(); queue(); });
+    window.addEventListener('load', function () { measure(); queue(); });
+  }
 })();

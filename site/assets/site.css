@@ -290,6 +290,12 @@ h1, h2, h3, p, figure, dl, dd { margin: 0; }
 .window-bar p { flex: 1; margin-right: 43px; text-align: center; font: 500 12px/1 var(--mono); color: var(--muted); }
 .window img { width: 100%; height: auto; vertical-align: top; }
 .hero-shot { max-width: 1120px; box-shadow: 0 1px 2px rgba(0, 0, 0, .06), 0 24px 64px -12px rgba(0, 0, 0, .22); }
+/* site.js sets --tilt from 1 (page at the top) to 0 (half of the screenshot in view). */
+.js .hero-shot { --tilt: 1; transform-origin: 50% 0;
+  transform: perspective(2000px) rotateX(calc(var(--tilt) * 20deg)) scale(calc(1 - var(--tilt) * .04)); will-change: transform; }
+@media (prefers-reduced-motion: reduce) {
+  .js .hero-shot { transform: none; will-change: auto; }
+}
 @media (max-width: 640px) {
   .window { border-radius: 12px; }
   .window-bar { height: 32px; padding: 0 12px; }
