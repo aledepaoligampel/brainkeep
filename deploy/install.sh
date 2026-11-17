@@ -53,7 +53,11 @@ fi
 install -d -m 0755 "/opt/brainkeep/releases/$RELEASE"
 install -m 0755 brainkeep "/opt/brainkeep/releases/$RELEASE/brainkeep"
 install -m 0755 deploy/backup.sh "/opt/brainkeep/releases/$RELEASE/backup.sh"
-if [ -L /opt/brainkeep/current ]; then
+if [ -f deploy/upgrade.sh ]; then
+  install -m 0755 deploy/upgrade.sh "/opt/brainkeep/releases/$RELEASE/upgrade.sh"
+fi
+# Re-installing the running release must not overwrite the rollback target.
+if [ -L /opt/brainkeep/current ] && [ "$(readlink /opt/brainkeep/current)" != "releases/$RELEASE" ]; then
   readlink /opt/brainkeep/current > /opt/brainkeep/previous-release
 fi
 rm -f /opt/brainkeep/next

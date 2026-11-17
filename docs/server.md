@@ -6,7 +6,20 @@ authenticated HTTP on loopback for remote clients, behind your HTTPS reverse pro
 
 ## Install on Linux (systemd)
 
-Build on the host (or cross-compile) and stage the binary with `deploy/`:
+Each [release](https://github.com/aledepaoligampel/brainkeep/releases) ships
+`brainkeep-<version>-<aarch64|x86_64>-linux.tar.gz` (binary, `deploy/`, protocol tests),
+`SHA256SUMS` and GitHub build provenance. Download and verify one:
+
+```sh
+v=0.1.0; a=$(uname -m)   # aarch64 or x86_64
+curl -fLO https://github.com/aledepaoligampel/brainkeep/releases/download/v$v/brainkeep-$v-$a-linux.tar.gz
+curl -fLO https://github.com/aledepaoligampel/brainkeep/releases/download/v$v/SHA256SUMS
+sha256sum --ignore-missing -c SHA256SUMS
+gh attestation verify brainkeep-$v-$a-linux.tar.gz --repo aledepaoligampel/brainkeep   # optional
+tar -xzf brainkeep-$v-$a-linux.tar.gz && mv brainkeep-$v-$a-linux stage
+```
+
+Or build from source and stage the binary with `deploy/`:
 
 ```sh
 cargo build --locked --release
@@ -35,6 +48,25 @@ with nginx: `proxy_set_header CF-Connecting-IP $remote_addr;`.
 `/etc/brainkeep/env` holds `BRAINKEEP_HOST` and `BRAINKEEP_ARGS` (extra
 flags, for example `--oauth-file /etc/brainkeep/google.json`). Restart the
 service after changing it.
+
+### Upgrade
+
+`install.sh` copies `upgrade.sh` next to the binary. As a user with sudo:
+
+```sh
+sh /opt/brainkeep/current/upgrade.sh 0.2.0
+```
+
+It downloads that release, checks `SHA256SUMS` and, when `gh` is installed and signed in,
+verifies that the tarball was built by this repository's release workflow from that tag.
+It then runs the protocol suites against the downloaded binary (needs `python3`), takes a
+backup and runs `deploy/install.sh`. If the service does not stay up, it switches back to
+the previous release. Data, credentials and `/etc/brainkeep/env` are kept;
+`/opt/brainkeep/previous-release` names the release to go back to. Installs older than
+the first release have no `upgrade.sh` yet: run the one inside the release tarball.
+
+Release binaries are built on Ubuntu 24.04 and need glibc 2.39 or newer (Debian 13,
+Ubuntu 24.04 or later). On older systems, build from source.
 
 ## Fixed tokens (`auth.json`)
 
