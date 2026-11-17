@@ -11,3 +11,4 @@ for test in protocol http_protocol oauth_protocol compact_protocol panel_protoco
   python3 "tests/$test.py"
 done
 node tests/panel_render.mjs
+python3 tests/site.py

@@ -1,0 +1,231 @@
+{
+  "meta": {
+    "title": "Brainkeep — shared memory for AI agents",
+    "description": "Shared, user-controlled memory for AI agents. Claude Code, claude.ai, Codex and any MCP client save and recall the same decisions, discoveries and progress across sessions, tools and people.",
+    "locale": "en_US"
+  },
+  "nav": {
+    "skip": "Skip to content",
+    "home": "Brainkeep, home",
+    "label": "Main",
+    "concept": "Concept",
+    "how": "How it works",
+    "features": "Features",
+    "selfhost": "Self-host",
+    "docs": "Docs",
+    "install": "Install",
+    "language": "Language",
+    "theme": "Switch between light and dark theme"
+  },
+  "hero": {
+    "eyebrow": "Open source · MCP server",
+    "h1a": "Your agents forget.",
+    "h1b": "Brainkeep remembers.",
+    "sub": "What your agents decide, discover and remember, in one place — shared across sessions, tools and people.",
+    "cta1": "Install Brainkeep",
+    "cta2": "View on GitHub",
+    "agents": "Works with",
+    "any": "and any MCP client"
+  },
+  "ledger": {
+    "label": "Example memories in a Brainkeep project",
+    "project": "Project",
+    "live": "Live",
+    "rows": [
+      {
+        "kind": "decision",
+        "kindLabel": "Decision",
+        "state": "confirmed",
+        "stateLabel": "confirmed",
+        "rev": "3",
+        "text": "Use idempotency keys on every POST /payments request.",
+        "mark": "claude",
+        "agent": "Claude Code",
+        "who": "Ana",
+        "when": "2 h"
+      },
+      {
+        "kind": "discovery",
+        "kindLabel": "Discovery",
+        "state": "proposed",
+        "stateLabel": "proposed",
+        "rev": "1",
+        "text": "Webhooks are retried for days — deduplicate by event id.",
+        "mark": "openai",
+        "agent": "Codex",
+        "who": "Leo",
+        "when": "5 h"
+      },
+      {
+        "kind": "progress",
+        "kindLabel": "Progress",
+        "state": "confirmed",
+        "stateLabel": "confirmed",
+        "rev": "2",
+        "text": "Refund flow migrated. Tests green, release pending.",
+        "mark": "antigravity",
+        "agent": "Antigravity",
+        "who": "Ana",
+        "when": "1 d"
+      }
+    ],
+    "rejectTitle": "Not stored: looks like an API key",
+    "rejectBody": "Secret-shaped text is rejected before it reaches the database."
+  },
+  "concept": {
+    "label": "The idea",
+    "title": "What one agent learns, every agent knows.",
+    "body": "A chat ends, you switch tools, a teammate picks up the work — and the context is gone. With Brainkeep your agents write down what matters as they go and read it back before they start, in any client and for your whole team.",
+    "diagram": "Every agent reads and writes one shared memory, which your team can open with its own permissions.",
+    "agents": "Your agents",
+    "any": "Any MCP client",
+    "core1": "Projects, revisions and authors",
+    "core2": "in one memory you control",
+    "team": "Your team",
+    "people": [
+      {
+        "initial": "A",
+        "name": "Ana",
+        "role": "Owner"
+      },
+      {
+        "initial": "L",
+        "name": "Leo",
+        "role": "Read and write"
+      },
+      {
+        "initial": "M",
+        "name": "Mara",
+        "role": "Read only"
+      }
+    ]
+  },
+  "how": {
+    "label": "How it works",
+    "title": "Save, revise, recall.",
+    "steps": [
+      {
+        "n": "1",
+        "tool": "remember",
+        "title": "Save",
+        "body": "Agents record decisions, discoveries and progress on their own, guided by a short protocol the server sends — no long prompts.",
+        "code": "remember(\n  kind: \"decision\",\n  topic: \"payments-idempotency\",\n  content: \"Use idempotency keys…\"\n)"
+      },
+      {
+        "n": "2",
+        "tool": "correct",
+        "title": "Revise",
+        "body": "A change appends a revision; history is never overwritten. Stale edits are refused, so two agents can’t silently overwrite each other.",
+        "code": "correct(\n  id: \"mem_8f2c\",\n  expected_revision: 2,\n  content: \"…and on refunds too\"\n)"
+      },
+      {
+        "n": "3",
+        "tool": "context",
+        "title": "Recall",
+        "body": "Before work, any agent pulls compact context for the project — in any client, for anyone you share it with.",
+        "code": "context(\n  project: \"checkout-api\",\n  compact: true\n)"
+      }
+    ]
+  },
+  "features": {
+    "label": "Features",
+    "title": "A small server with a serious memory.",
+    "rust": {
+      "badge": "Written in Rust",
+      "title1": "Native Rust,",
+      "title2": "end to end.",
+      "body": "One binary with no runtime and no garbage collector, embedded SQLite and the web panel built in. Nothing else to install: no Node, no Python, no database server. It runs even on a Raspberry Pi.",
+      "specs": [
+        {
+          "k": "Language",
+          "v": "Rust, no GC"
+        },
+        {
+          "k": "Storage",
+          "v": "Embedded SQLite"
+        },
+        {
+          "k": "Panel",
+          "v": "Built into the binary"
+        },
+        {
+          "k": "Runs on",
+          "v": "macOS · Linux · Raspberry Pi"
+        }
+      ]
+    },
+    "items": [
+      {
+        "icon": "history",
+        "title": "Revisions and authorship",
+        "body": "Every memory keeps its full history, with verified authorship on each revision."
+      },
+      {
+        "icon": "team",
+        "title": "Built for teams",
+        "body": "Invite people by email, share projects read-only or read-write, revoke access instantly. Google sign-in over OAuth."
+      },
+      {
+        "icon": "compact",
+        "title": "Small context footprint",
+        "body": "Compact responses and a short memory protocol, so agents save on their own without bloating the prompt."
+      },
+      {
+        "icon": "shield",
+        "title": "Safe by default",
+        "body": "Passwords, keys and tokens are rejected before storage. Private files and per-user request limits."
+      },
+      {
+        "icon": "panel",
+        "title": "A panel for people",
+        "body": "Search, filters, history, diffs and live updates. Edit with conflict handling, archive and restore."
+      },
+      {
+        "icon": "archive",
+        "title": "Backups and migrations",
+        "body": "Consistent backups on a systemd timer and schema migrations with snapshots, so upgrades are safe."
+      }
+    ]
+  },
+  "self": {
+    "label": "Self-host",
+    "title": "Your memory lives on your machine.",
+    "body": "Run it locally for yourself in a minute, or on any Linux host with systemd behind HTTPS for your whole team — a Raspberry Pi is enough.",
+    "paths": [
+      {
+        "title": "Local, single user",
+        "body": "Download a release and connect your agents.",
+        "href": "https://github.com/aledepaoligampel/brainkeep#quick-start-local-single-user"
+      },
+      {
+        "title": "Server for a team",
+        "body": "Users, sharing, Google sign-in and backups.",
+        "href": "https://github.com/aledepaoligampel/brainkeep/blob/main/docs/server.md"
+      }
+    ],
+    "note": "macOS (Apple silicon) and Linux. Windows is not supported yet.",
+    "term": "Quick start",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copyLabel": "Copy the quick start commands",
+    "copiedStatus": "Commands copied.",
+    "system": "Operating system",
+    "step1": "Download and verify",
+    "step2": "Install",
+    "step3": "Run and connect Claude Code"
+  },
+  "cta": {
+    "title1": "Give your agents",
+    "title2": "a memory worth keeping.",
+    "body": "Open source, MIT licensed, and entirely under your control.",
+    "primary": "Download a release",
+    "secondary": "Read the docs"
+  },
+  "footer": {
+    "label": "Footer",
+    "tagline": "Shared memory for AI agents",
+    "releases": "Releases",
+    "status": "Early release",
+    "trademarks": "Claude, Codex and Antigravity are trademarks of their respective owners; Brainkeep is not affiliated with them."
+  }
+}

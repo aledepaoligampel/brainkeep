@@ -27,7 +27,7 @@ Download a [release](https://github.com/aledepaoligampel/brainkeep/releases) (ma
 Apple silicon, or Linux `aarch64`/`x86_64`), check it and put the binary on your `PATH`:
 
 ```sh
-v=0.1.0; t=brainkeep-$v-aarch64-macos    # Linux: t=brainkeep-$v-$(uname -m)-linux
+v=0.1.1; t=brainkeep-$v-aarch64-macos    # Linux: t=brainkeep-$v-$(uname -m)-linux
 base=https://github.com/aledepaoligampel/brainkeep/releases/download/v$v
 curl -fLO $base/$t.tar.gz && curl -fLO $base/SHA256SUMS
 grep " $t.tar.gz\$" SHA256SUMS | shasum -a 256 -c
@@ -69,7 +69,11 @@ The plugin does not configure the MCP server; connect it first. Details:
 ./scripts/check.sh            # format, clippy, tests, protocol tests
 ./scripts/check-database.sh   # storage and migration tests
 cd panel-ui && npm ci --ignore-scripts && npx vite build   # rebuild the web panel
+python3 scripts/build_site.py # regenerate the brainkeep.dev landing in site/
 ```
+
+The landing (`site/`, served as plain files) is generated from `site-src/` and reuses the
+panel's tokens and fonts; commit its output after editing copy or markup.
 
 The web panel (Svelte 5 + Bits UI) is compiled into `src/panel/` and embedded in the
 binary, so servers never need Node.

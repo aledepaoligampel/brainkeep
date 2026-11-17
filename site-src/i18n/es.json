@@ -1,0 +1,231 @@
+{
+  "meta": {
+    "title": "Brainkeep — memoria compartida para agentes de IA",
+    "description": "Memoria compartida y bajo tu control para agentes de IA. Claude Code, claude.ai, Codex y cualquier cliente MCP guardan y recuperan las mismas decisiones, hallazgos y avances, entre sesiones, herramientas y personas.",
+    "locale": "es_419"
+  },
+  "nav": {
+    "skip": "Ir al contenido",
+    "home": "Brainkeep, inicio",
+    "label": "Principal",
+    "concept": "Concepto",
+    "how": "Cómo funciona",
+    "features": "Funciones",
+    "selfhost": "Autoalojado",
+    "docs": "Docs",
+    "install": "Instalar",
+    "language": "Idioma",
+    "theme": "Cambiar entre tema claro y oscuro"
+  },
+  "hero": {
+    "eyebrow": "Código abierto · servidor MCP",
+    "h1a": "Tus agentes olvidan.",
+    "h1b": "Brainkeep recuerda.",
+    "sub": "Lo que tus agentes deciden, descubren y recuerdan, en un solo lugar, compartido entre sesiones, herramientas y personas.",
+    "cta1": "Instalar Brainkeep",
+    "cta2": "Ver en GitHub",
+    "agents": "Funciona con",
+    "any": "y cualquier cliente MCP"
+  },
+  "ledger": {
+    "label": "Memorias de ejemplo en un proyecto de Brainkeep",
+    "project": "Proyecto",
+    "live": "En vivo",
+    "rows": [
+      {
+        "kind": "decision",
+        "kindLabel": "Decisión",
+        "state": "confirmed",
+        "stateLabel": "confirmada",
+        "rev": "3",
+        "text": "Usar claves de idempotencia en cada POST /payments.",
+        "mark": "claude",
+        "agent": "Claude Code",
+        "who": "Ana",
+        "when": "2 h"
+      },
+      {
+        "kind": "discovery",
+        "kindLabel": "Hallazgo",
+        "state": "proposed",
+        "stateLabel": "propuesta",
+        "rev": "1",
+        "text": "Los webhooks se reintentan durante días: deduplicar por id de evento.",
+        "mark": "openai",
+        "agent": "Codex",
+        "who": "Leo",
+        "when": "5 h"
+      },
+      {
+        "kind": "progress",
+        "kindLabel": "Progreso",
+        "state": "confirmed",
+        "stateLabel": "confirmada",
+        "rev": "2",
+        "text": "Flujo de reembolsos migrado. Tests en verde, falta el release.",
+        "mark": "antigravity",
+        "agent": "Antigravity",
+        "who": "Ana",
+        "when": "1 d"
+      }
+    ],
+    "rejectTitle": "No se guardó: parece una API key",
+    "rejectBody": "El texto con forma de secreto se rechaza antes de llegar a la base de datos."
+  },
+  "concept": {
+    "label": "La idea",
+    "title": "Lo que aprende un agente, lo saben todos.",
+    "body": "Termina un chat, cambiás de herramienta, otra persona retoma el trabajo… y el contexto se pierde. Con Brainkeep tus agentes anotan lo importante mientras trabajan y lo leen antes de empezar, desde cualquier cliente y para todo tu equipo.",
+    "diagram": "Todos los agentes leen y escriben una sola memoria compartida, que tu equipo puede abrir con sus propios permisos.",
+    "agents": "Tus agentes",
+    "any": "Cualquier cliente MCP",
+    "core1": "Proyectos, revisiones y autores",
+    "core2": "en una memoria que controlás vos",
+    "team": "Tu equipo",
+    "people": [
+      {
+        "initial": "A",
+        "name": "Ana",
+        "role": "Dueña"
+      },
+      {
+        "initial": "L",
+        "name": "Leo",
+        "role": "Lectura y escritura"
+      },
+      {
+        "initial": "M",
+        "name": "Mara",
+        "role": "Solo lectura"
+      }
+    ]
+  },
+  "how": {
+    "label": "Cómo funciona",
+    "title": "Guardar, revisar, recordar.",
+    "steps": [
+      {
+        "n": "1",
+        "tool": "remember",
+        "title": "Guardar",
+        "body": "Los agentes registran decisiones, hallazgos y avances por su cuenta, guiados por un protocolo breve que envía el servidor. Sin prompts largos.",
+        "code": "remember(\n  kind: \"decision\",\n  topic: \"payments-idempotency\",\n  content: \"Usar claves de idempotencia…\"\n)"
+      },
+      {
+        "n": "2",
+        "tool": "correct",
+        "title": "Revisar",
+        "body": "Cada cambio agrega una revisión; el historial nunca se pisa. Las ediciones desactualizadas se rechazan, así dos agentes no se sobrescriben en silencio.",
+        "code": "correct(\n  id: \"mem_8f2c\",\n  expected_revision: 2,\n  content: \"…y también en reembolsos\"\n)"
+      },
+      {
+        "n": "3",
+        "tool": "context",
+        "title": "Recordar",
+        "body": "Antes de trabajar, cualquier agente trae el contexto compacto del proyecto, desde cualquier cliente y para cualquiera con quien lo compartas.",
+        "code": "context(\n  project: \"checkout-api\",\n  compact: true\n)"
+      }
+    ]
+  },
+  "features": {
+    "label": "Funciones",
+    "title": "Un servidor chico con una memoria en serio.",
+    "rust": {
+      "badge": "Escrito en Rust",
+      "title1": "Rust nativo,",
+      "title2": "de punta a punta.",
+      "body": "Un binario sin runtime ni recolector de basura, con SQLite embebido y el panel incluido. No hay nada más que instalar: ni Node, ni Python, ni un servidor de base de datos. Corre hasta en una Raspberry Pi.",
+      "specs": [
+        {
+          "k": "Lenguaje",
+          "v": "Rust, sin GC"
+        },
+        {
+          "k": "Almacenamiento",
+          "v": "SQLite embebido"
+        },
+        {
+          "k": "Panel",
+          "v": "Incluido en el binario"
+        },
+        {
+          "k": "Corre en",
+          "v": "macOS · Linux · Raspberry Pi"
+        }
+      ]
+    },
+    "items": [
+      {
+        "icon": "history",
+        "title": "Revisiones y autoría",
+        "body": "Cada memoria conserva todo su historial, con autoría verificada en cada revisión."
+      },
+      {
+        "icon": "team",
+        "title": "Pensado para equipos",
+        "body": "Invitá por email, compartí proyectos en solo lectura o lectura y escritura, y revocá el acceso al instante. Inicio de sesión con Google vía OAuth."
+      },
+      {
+        "icon": "compact",
+        "title": "Poco contexto",
+        "body": "Respuestas compactas y un protocolo de memoria breve: los agentes guardan solos sin inflar el prompt."
+      },
+      {
+        "icon": "shield",
+        "title": "Seguro por defecto",
+        "body": "Contraseñas, claves y tokens se rechazan antes de guardarse. Archivos privados y límites por usuario."
+      },
+      {
+        "icon": "panel",
+        "title": "Un panel para personas",
+        "body": "Búsqueda, filtros, historial, diffs y actualizaciones en vivo. Edición con manejo de conflictos, archivar y restaurar."
+      },
+      {
+        "icon": "archive",
+        "title": "Backups y migraciones",
+        "body": "Backups consistentes con un timer de systemd y migraciones de esquema con snapshots, para actualizar sin miedo."
+      }
+    ]
+  },
+  "self": {
+    "label": "Autoalojado",
+    "title": "Tu memoria vive en tu máquina.",
+    "body": "Corrélo en local para vos en un minuto, o en cualquier host Linux con systemd detrás de HTTPS para todo tu equipo. Alcanza con una Raspberry Pi.",
+    "paths": [
+      {
+        "title": "Local, un usuario",
+        "body": "Descargá un release y conectá tus agentes.",
+        "href": "https://github.com/aledepaoligampel/brainkeep#quick-start-local-single-user"
+      },
+      {
+        "title": "Servidor para un equipo",
+        "body": "Usuarios, permisos, inicio con Google y backups.",
+        "href": "https://github.com/aledepaoligampel/brainkeep/blob/main/docs/server.md"
+      }
+    ],
+    "note": "macOS (Apple silicon) y Linux. Windows todavía no está soportado.",
+    "term": "Inicio rápido",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "copyLabel": "Copiar los comandos de inicio rápido",
+    "copiedStatus": "Comandos copiados.",
+    "system": "Sistema operativo",
+    "step1": "Descargar y verificar",
+    "step2": "Instalar",
+    "step3": "Iniciar y conectar Claude Code"
+  },
+  "cta": {
+    "title1": "Dales a tus agentes",
+    "title2": "una memoria que valga la pena.",
+    "body": "Código abierto, licencia MIT y completamente bajo tu control.",
+    "primary": "Descargar un release",
+    "secondary": "Leer la documentación"
+  },
+  "footer": {
+    "label": "Pie de página",
+    "tagline": "Memoria compartida para agentes de IA",
+    "releases": "Releases",
+    "status": "Versión temprana",
+    "trademarks": "Claude, Codex y Antigravity son marcas de sus respectivos dueños; Brainkeep no está afiliado a ellos."
+  }
+}
