@@ -117,7 +117,9 @@ def outputs():
         ctx.update(lang=lang, path=path, origin=ORIGIN, version=version(), ld=structured_data(ctx, lang, path),
                    langs=[{"code": code, "href": href, "label": code.upper(),
                            "current": "page" if code == lang else "false"} for code, href in LANGS.items()])
-        page = render(template, ctx, assets)
+        # The panel screenshots come from scripts/panel_screenshots.py, one pair per language.
+        shots = {f"panel-{theme}.png": asset(f"panel-{lang}-{theme}.png") for theme in ("light", "dark")}
+        page = render(template, ctx, {**assets, **shots})
         if "{{" in page or "{%" in page:
             raise ValueError(f"{lang}: unrendered template markers")
         files[("" if path == "/" else path.strip("/") + "/") + "index.html"] = page.encode()

@@ -28,52 +28,8 @@
     "cta1": "Install Brainkeep",
     "cta2": "View on GitHub",
     "agents": "Works with",
-    "any": "and any MCP client"
-  },
-  "ledger": {
-    "label": "Example memories in a Brainkeep project",
-    "project": "Project",
-    "live": "Live",
-    "rows": [
-      {
-        "kind": "decision",
-        "kindLabel": "Decision",
-        "state": "confirmed",
-        "stateLabel": "confirmed",
-        "rev": "3",
-        "text": "Use idempotency keys on every POST /payments request.",
-        "mark": "claude",
-        "agent": "Claude Code",
-        "who": "Ana",
-        "when": "2 h"
-      },
-      {
-        "kind": "discovery",
-        "kindLabel": "Discovery",
-        "state": "proposed",
-        "stateLabel": "proposed",
-        "rev": "1",
-        "text": "Webhooks are retried for days — deduplicate by event id.",
-        "mark": "openai",
-        "agent": "Codex",
-        "who": "Leo",
-        "when": "5 h"
-      },
-      {
-        "kind": "progress",
-        "kindLabel": "Progress",
-        "state": "confirmed",
-        "stateLabel": "confirmed",
-        "rev": "2",
-        "text": "Refund flow migrated. Tests green, release pending.",
-        "mark": "antigravity",
-        "agent": "Antigravity",
-        "who": "Ana",
-        "when": "1 d"
-      }
-    ],
-    "rejectTitle": "Not stored: looks like an API key",
-    "rejectBody": "Secret-shaped text is rejected before it reaches the database."
+    "any": "and any MCP client",
+    "shotAlt": "The Brainkeep web panel: a list of memories from a checkout project, and an open decision with its content and revision history."
   },
   "concept": {
     "label": "The idea",

@@ -30,7 +30,7 @@
 <link rel="preload" href="/assets/fonts/lora-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/lora-latin-wght-italic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/tokens.css?v=742f44fd47">
-<link rel="stylesheet" href="/assets/site.css?v=ac03c61829">
+<link rel="stylesheet" href="/assets/site.css?v=ddba081ed7">
 <script src="/assets/theme.js?v=8d00aba88d"></script>
 <script src="/assets/site.js?v=7b26270a79" defer></script>
 </head>
@@ -93,7 +93,7 @@
 
 <main id="main">
 <section class="hero" id="top">
-  <div class="wrap hero-grid">
+  <div class="wrap hero-inner">
     <div class="hero-copy">
       <p class="pill"><span class="live-dot"></span>Open source · MCP server · v0.1.1</p>
       <h1 class="display"><span>Your agents forget.</span> <em>Brainkeep remembers.</em></h1>
@@ -111,33 +111,10 @@
       </ul>
     </div>
 
-    <figure class="card ledger" aria-label="Example memories in a Brainkeep project">
-      <div class="ledger-head">
-        <span class="ledger-title"><span class="label">Project</span><span class="serif">checkout-api</span></span>
-        <span class="live"><span class="live-dot pulse"></span>Live</span>
-      </div>
-      <ul class="ledger-rows">
-        
-        <li class="ledger-row">
-          <div class="row-top"><span class="kind decision">Decision</span><span class="state confirmed">confirmed · rev 3</span></div>
-          <p class="row-text">Use idempotency keys on every POST /payments request.</p>
-          <div class="row-meta"><span class="agent agent-claude"><svg aria-hidden="true" width="13" height="13"><use href="#m-claude"/></svg></span><span class="who">Claude Code</span><span>·</span><span>Ana</span><span>·</span><span>2 h</span></div>
-        </li>
-        
-        <li class="ledger-row">
-          <div class="row-top"><span class="kind discovery">Discovery</span><span class="state proposed">proposed · rev 1</span></div>
-          <p class="row-text">Webhooks are retried for days — deduplicate by event id.</p>
-          <div class="row-meta"><span class="agent agent-openai"><svg aria-hidden="true" width="13" height="13"><use href="#m-openai"/></svg></span><span class="who">Codex</span><span>·</span><span>Leo</span><span>·</span><span>5 h</span></div>
-        </li>
-        
-        <li class="ledger-row">
-          <div class="row-top"><span class="kind progress">Progress</span><span class="state confirmed">confirmed · rev 2</span></div>
-          <p class="row-text">Refund flow migrated. Tests green, release pending.</p>
-          <div class="row-meta"><span class="agent agent-antigravity"><svg aria-hidden="true" width="13" height="13"><use href="#m-antigravity"/></svg></span><span class="who">Antigravity</span><span>·</span><span>Ana</span><span>·</span><span>1 d</span></div>
-        </li>
-        
-      </ul>
-      <p class="reject"><svg class="ic" aria-hidden="true" width="16" height="16"><use href="#i-lock"/></svg><span><strong>Not stored: looks like an API key</strong><span>Secret-shaped text is rejected before it reaches the database.</span></span></p>
+    <figure class="window hero-shot">
+      <div class="window-bar" aria-hidden="true"><span></span><span></span><span></span><p>memory.example.com/panel</p></div>
+      <img class="when-light" src="/assets/panel-en-light.png?v=58c03cf1a5" width="2880" height="1800" alt="The Brainkeep web panel: a list of memories from a checkout project, and an open decision with its content and revision history." fetchpriority="high" decoding="async">
+      <img class="when-dark" src="/assets/panel-en-dark.png?v=46a7bb26cc" width="2880" height="1800" alt="The Brainkeep web panel: a list of memories from a checkout project, and an open decision with its content and revision history." loading="lazy" decoding="async">
     </figure>
   </div>
 </section>

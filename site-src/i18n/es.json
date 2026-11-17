@@ -28,52 +28,8 @@
     "cta1": "Instalar Brainkeep",
     "cta2": "Ver en GitHub",
     "agents": "Funciona con",
-    "any": "y cualquier cliente MCP"
-  },
-  "ledger": {
-    "label": "Memorias de ejemplo en un proyecto de Brainkeep",
-    "project": "Proyecto",
-    "live": "En vivo",
-    "rows": [
-      {
-        "kind": "decision",
-        "kindLabel": "Decisión",
-        "state": "confirmed",
-        "stateLabel": "confirmada",
-        "rev": "3",
-        "text": "Usar claves de idempotencia en cada POST /payments.",
-        "mark": "claude",
-        "agent": "Claude Code",
-        "who": "Ana",
-        "when": "2 h"
-      },
-      {
-        "kind": "discovery",
-        "kindLabel": "Hallazgo",
-        "state": "proposed",
-        "stateLabel": "propuesta",
-        "rev": "1",
-        "text": "Los webhooks se reintentan durante días: deduplicar por id de evento.",
-        "mark": "openai",
-        "agent": "Codex",
-        "who": "Leo",
-        "when": "5 h"
-      },
-      {
-        "kind": "progress",
-        "kindLabel": "Progreso",
-        "state": "confirmed",
-        "stateLabel": "confirmada",
-        "rev": "2",
-        "text": "Flujo de reembolsos migrado. Tests en verde, falta el release.",
-        "mark": "antigravity",
-        "agent": "Antigravity",
-        "who": "Ana",
-        "when": "1 d"
-      }
-    ],
-    "rejectTitle": "No se guardó: parece una API key",
-    "rejectBody": "El texto con forma de secreto se rechaza antes de llegar a la base de datos."
+    "any": "y cualquier cliente MCP",
+    "shotAlt": "El panel web de Brainkeep: una lista de memorias de un proyecto de checkout y una decisión abierta con su contenido e historial de revisiones."
   },
   "concept": {
     "label": "La idea",

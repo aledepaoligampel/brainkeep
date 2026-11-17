@@ -1,0 +1,47 @@
+{
+  "owner": {"handle": "lucia", "name": "Lucía Ferrer"},
+  "team": [
+    {"handle": "mateo", "email": "mateo@example.com", "name": "Mateo Silva"},
+    {"handle": "nora", "email": "nora@example.com", "name": "Nora Patel"}
+  ],
+  "share": {"checkout": ["mateo", "nora"]},
+  "focus": "Los pagos pasan por una única cola idempotente",
+  "memories": [
+    {
+      "project": "checkout", "by": "lucia", "agent": "Claude Code", "kind": "decision", "topic": "payments-queue",
+      "title": "Los pagos pasan por una única cola idempotente", "confirmed": true,
+      "revisions": [
+        {"ago": 4320, "agent": "Codex", "content": "Reintentar los cobros fallidos desde el handler de la API.\n\n- Hasta 3 intentos con backoff."},
+        {"ago": 1500, "agent": "Claude Code", "content": "Cada cobro se encola con una clave de idempotencia; el worker es el único que llama al proveedor de pagos.\n\n- Hasta 3 intentos con backoff exponencial.\n- Los reembolsos usan la misma cola."},
+        {"ago": 38, "agent": "Claude Code", "content": "Cada cobro se encola con una **clave de idempotencia** derivada del ID del pedido; el worker es el único que llama al proveedor de pagos.\n\n- Hasta 3 intentos con backoff exponencial (2 s, 8 s, 30 s).\n- Los reembolsos y las capturas parciales usan la misma cola.\n- Un cobro trabado más de 10 minutos avisa a la guardia.\n\n**Por qué:** los cobros dobles del incidente de marzo vinieron de dos handlers que reintentaban el mismo pedido.\n\n**Límites:** el proveedor guarda las claves 24 horas; un reintento manual después de eso necesita una clave nueva."}
+      ]
+    },
+    {"project": "checkout", "by": "mateo", "agent": "Codex", "kind": "discovery", "topic": "tax-rounding", "ago": 95,
+     "title": "Los impuestos difieren en un centavo con envíos divididos",
+     "content": "Redondear cada envío por separado y después sumar no da lo mismo que redondear el total del pedido. Redondear una vez por pedido y asignar el resto a la última línea."},
+    {"project": "checkout", "by": "nora", "agent": "Antigravity", "kind": "progress", "topic": "apple-pay", "ago": 160,
+     "title": "Apple Pay funciona de punta a punta en staging",
+     "content": "La verificación del dominio, la sesión del comercio y el intercambio del token pasan en staging. Falta el certificado del comercio de producción."},
+    {"project": "checkout", "by": "lucia", "agent": "Claude Code", "kind": "preference", "topic": "error-copy", "ago": 290, "confirmed": true,
+     "title": "Los errores dicen qué hacer a continuación",
+     "content": "Escribir los errores de pago como una acción: \"Revisá el número de tarjeta\" en lugar de \"Dato inválido\". Nunca mostrar códigos del proveedor al comprador."},
+    {"project": "checkout", "by": "mateo", "agent": "Codex", "kind": "decision", "topic": "address-form", "ago": 1380, "confirmed": true,
+     "title": "Autocompletar la dirección recién desde tres caracteres",
+     "content": "Menos pedidos y sin parpadeo en el celular. La búsqueda espera 250 ms entre teclas."},
+    {"project": "checkout", "by": "lucia", "agent": "Claude Code", "kind": "note", "topic": "load-test", "ago": 2900,
+     "title": "Plan de prueba de carga para Black Friday",
+     "content": "Objetivo: 1.200 pedidos por minuto durante 30 minutos con 5 % de tarjetas rechazadas. Correrla el jueves contra la réplica de staging."},
+    {"project": "checkout", "by": "nora", "agent": "Antigravity", "kind": "discovery", "topic": "safari-autofill", "ago": 4100,
+     "title": "El autocompletado de Safari saltea el código postal",
+     "content": "El campo necesita autocomplete=\"postal-code\" y no puede estar dentro de un fieldset oculto al cargar la página."},
+    {"project": "mobile-app", "by": "lucia", "agent": "Codex", "kind": "decision", "topic": "offline-cart", "ago": 610, "confirmed": true,
+     "title": "El carrito se guarda sin conexión y se sincroniza al abrir",
+     "content": "Ganan los cambios locales salvo que un precio haya cambiado en el servidor; en ese caso la app pregunta antes de pagar."},
+    {"project": "mobile-app", "by": "lucia", "agent": "Claude Code", "kind": "progress", "topic": "push-tokens", "ago": 3000,
+     "title": "Tokens de push migrados al nuevo proveedor",
+     "content": "El 92 % de los dispositivos activos ya se registró de nuevo. El resto se actualiza al próximo inicio."},
+    {"project": "design-system", "by": "lucia", "agent": "Antigravity", "kind": "preference", "topic": "spacing", "ago": 5200,
+     "title": "El espaciado usa una escala de 4 px",
+     "content": "Pasos permitidos: 4, 8, 12, 16, 24, 32, 48. Cualquier otro valor necesita un comentario en el componente."}
+  ]
+}

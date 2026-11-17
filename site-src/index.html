@@ -93,7 +93,7 @@
 
 <main id="main">
 <section class="hero" id="top">
-  <div class="wrap hero-grid">
+  <div class="wrap hero-inner">
     <div class="hero-copy">
       <p class="pill"><span class="live-dot"></span>{{hero.eyebrow}} · v{{version}}</p>
       <h1 class="display"><span>{{hero.h1a}}</span> <em>{{hero.h1b}}</em></h1>
@@ -111,21 +111,10 @@
       </ul>
     </div>
 
-    <figure class="card ledger" aria-label="{{ledger.label}}">
-      <div class="ledger-head">
-        <span class="ledger-title"><span class="label">{{ledger.project}}</span><span class="serif">checkout-api</span></span>
-        <span class="live"><span class="live-dot pulse"></span>{{ledger.live}}</span>
-      </div>
-      <ul class="ledger-rows">
-        {% for r in ledger.rows %}
-        <li class="ledger-row">
-          <div class="row-top"><span class="kind {{r.kind}}">{{r.kindLabel}}</span><span class="state {{r.state}}">{{r.stateLabel}} · rev {{r.rev}}</span></div>
-          <p class="row-text">{{r.text}}</p>
-          <div class="row-meta"><span class="agent agent-{{r.mark}}"><svg aria-hidden="true" width="13" height="13"><use href="#m-{{r.mark}}"/></svg></span><span class="who">{{r.agent}}</span><span>·</span><span>{{r.who}}</span><span>·</span><span>{{r.when}}</span></div>
-        </li>
-        {% endfor %}
-      </ul>
-      <p class="reject"><svg class="ic" aria-hidden="true" width="16" height="16"><use href="#i-lock"/></svg><span><strong>{{ledger.rejectTitle}}</strong><span>{{ledger.rejectBody}}</span></span></p>
+    <figure class="window hero-shot">
+      <div class="window-bar" aria-hidden="true"><span></span><span></span><span></span><p>memory.example.com/panel</p></div>
+      <img class="when-light" src="{{asset:panel-light.png}}" width="2880" height="1800" alt="{{hero.shotAlt}}" fetchpriority="high" decoding="async">
+      <img class="when-dark" src="{{asset:panel-dark.png}}" width="2880" height="1800" alt="{{hero.shotAlt}}" loading="lazy" decoding="async">
     </figure>
   </div>
 </section>

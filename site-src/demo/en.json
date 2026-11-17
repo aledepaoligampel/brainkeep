@@ -1,0 +1,47 @@
+{
+  "owner": {"handle": "lucia", "name": "Lucía Ferrer"},
+  "team": [
+    {"handle": "mateo", "email": "mateo@example.com", "name": "Mateo Silva"},
+    {"handle": "nora", "email": "nora@example.com", "name": "Nora Patel"}
+  ],
+  "share": {"checkout": ["mateo", "nora"]},
+  "focus": "Payments go through a single idempotent queue",
+  "memories": [
+    {
+      "project": "checkout", "by": "lucia", "agent": "Claude Code", "kind": "decision", "topic": "payments-queue",
+      "title": "Payments go through a single idempotent queue", "confirmed": true,
+      "revisions": [
+        {"ago": 4320, "agent": "Codex", "content": "Retry failed card charges from the API handler.\n\n- Up to 3 attempts with backoff."},
+        {"ago": 1500, "agent": "Claude Code", "content": "Every charge is enqueued with an idempotency key; the worker is the only caller of the payment provider.\n\n- Up to 3 attempts with exponential backoff.\n- Refunds use the same queue."},
+        {"ago": 38, "agent": "Claude Code", "content": "Every charge is enqueued with an **idempotency key** derived from the order ID; the worker is the only caller of the payment provider.\n\n- Up to 3 attempts with exponential backoff (2s, 8s, 30s).\n- Refunds and partial captures use the same queue.\n- A charge stuck for more than 10 minutes pages the on-call.\n\n**Why:** double charges during the March incident came from two handlers retrying the same request.\n\n**Limits:** the provider keeps idempotency keys for 24 hours, so manual retries after that need a new key."}
+      ]
+    },
+    {"project": "checkout", "by": "mateo", "agent": "Codex", "kind": "discovery", "topic": "tax-rounding", "ago": 95,
+     "title": "Tax totals drift by one cent on split shipments",
+     "content": "Rounding each shipment separately and then summing differs from rounding the order total. Round once per order and allocate the remainder to the last line."},
+    {"project": "checkout", "by": "nora", "agent": "Antigravity", "kind": "progress", "topic": "apple-pay", "ago": 160,
+     "title": "Apple Pay works end to end in staging",
+     "content": "Domain verification, merchant session and the token exchange pass in staging. Pending: the production merchant certificate."},
+    {"project": "checkout", "by": "lucia", "agent": "Claude Code", "kind": "preference", "topic": "error-copy", "ago": 290, "confirmed": true,
+     "title": "Error messages say what to do next",
+     "content": "Write payment errors as an action: \"Check the card number\" instead of \"Invalid input\". Never show provider codes to buyers."},
+    {"project": "checkout", "by": "mateo", "agent": "Codex", "kind": "decision", "topic": "address-form", "ago": 1380, "confirmed": true,
+     "title": "Address autocomplete only after three characters",
+     "content": "Fewer requests and no flicker on mobile. The lookup is debounced at 250 ms."},
+    {"project": "checkout", "by": "lucia", "agent": "Claude Code", "kind": "note", "topic": "load-test", "ago": 2900,
+     "title": "Load test plan for Black Friday",
+     "content": "Target 1,200 orders per minute for 30 minutes with 5% card declines. Run it against the staging replica on Thursday."},
+    {"project": "checkout", "by": "nora", "agent": "Antigravity", "kind": "discovery", "topic": "safari-autofill", "ago": 4100,
+     "title": "Safari autofill skips the postal code field",
+     "content": "The field needs autocomplete=\"postal-code\" and must not sit inside a hidden fieldset when the page loads."},
+    {"project": "mobile-app", "by": "lucia", "agent": "Codex", "kind": "decision", "topic": "offline-cart", "ago": 610, "confirmed": true,
+     "title": "The cart is stored offline and synced on launch",
+     "content": "Local changes win unless a price changed on the server; then the app asks before checkout."},
+    {"project": "mobile-app", "by": "lucia", "agent": "Claude Code", "kind": "progress", "topic": "push-tokens", "ago": 3000,
+     "title": "Push tokens migrated to the new provider",
+     "content": "92% of active devices re-registered. The rest refresh on next launch."},
+    {"project": "design-system", "by": "lucia", "agent": "Antigravity", "kind": "preference", "topic": "spacing", "ago": 5200,
+     "title": "Spacing uses a 4 px scale",
+     "content": "Allowed steps: 4, 8, 12, 16, 24, 32, 48. Anything else needs a comment in the component."}
+  ]
+}
