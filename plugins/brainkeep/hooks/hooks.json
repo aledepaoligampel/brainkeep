@@ -1,5 +1,5 @@
 {
-  "description": "Brainkeep: after editing pcdd/changes/*.md (Edit/Write or shell) or publishing/opening an artifact, remind the model to record progress or the link in Brainkeep.",
+  "description": "Brainkeep: when a pcdd/changes/*.md edit (Edit/Write or shell) changes specs, tasks or Log entries, or after publishing/opening an artifact, remind the model to record the milestone or the link in Brainkeep.",
   "hooks": {
     "PostToolUse": [
       {

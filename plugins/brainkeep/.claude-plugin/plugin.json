@@ -1,7 +1,7 @@
 {
   "name": "brainkeep",
-  "version": "0.1.0",
-  "description": "Reminds Claude Code to record PCDD change progress and shared artifact links in Brainkeep.",
+  "version": "0.2.0",
+  "description": "Reminds Claude Code to record PCDD change milestones and shared artifact links in Brainkeep.",
   "author": {
     "name": "Brainkeep contributors"
   },
