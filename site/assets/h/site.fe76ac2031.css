@@ -204,6 +204,10 @@ h1, h2, h3, p, figure, dl, dd { margin: 0; }
 .path strong { font-size: 15px; font-weight: 600; }
 .path span span { font-size: 13px; color: var(--ink-2); }
 .path .ic { color: var(--accent); }
+.path .path-icon { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 10px; background: var(--accent-soft); color: var(--accent-ink);
+  display: inline-flex; align-items: center; justify-content: center; }
+.path .path-icon .ic { color: inherit; }
+.path .path-text { flex: 1 1 auto; min-width: 0; }
 .warn-note { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--warn); }
 .warn-note .ic { margin-top: 2px; }
 .terminal { min-width: 0; overflow: hidden; }

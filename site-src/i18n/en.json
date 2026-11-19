@@ -149,17 +149,28 @@
   "self": {
     "label": "Self-host",
     "title": "Your memory lives on your machine.",
-    "body": "Run it locally for yourself in a minute, or on any Linux host with systemd behind HTTPS for your whole team — a Raspberry Pi is enough.",
+    "body": "Run it locally for yourself in a minute, or for your whole team on any Linux host with systemd behind HTTPS — a Raspberry Pi is enough — or on Railway in one click.",
     "paths": [
       {
         "title": "Local, single user",
         "body": "One command installs it and connects Claude Code.",
-        "href": "https://github.com/aledepaoligampel/brainkeep#quick-start-local-single-user"
+        "href": "https://github.com/aledepaoligampel/brainkeep#quick-start-local-single-user",
+        "icon": "i-download",
+        "iconClass": "ic"
       },
       {
         "title": "Server for a team",
         "body": "Users, sharing, Google sign-in and backups.",
-        "href": "https://github.com/aledepaoligampel/brainkeep/blob/main/docs/server.md"
+        "href": "https://github.com/aledepaoligampel/brainkeep/blob/main/docs/server.md",
+        "icon": "i-team",
+        "iconClass": "ic"
+      },
+      {
+        "title": "Railway, one click",
+        "body": "Team server from a template, with a data volume.",
+        "href": "https://railway.com/deploy/brainkeep",
+        "icon": "m-railway",
+        "iconClass": "mk"
       }
     ],
     "note": "macOS (Apple silicon) and Linux. Windows is not supported yet.",

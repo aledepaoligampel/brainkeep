@@ -149,17 +149,28 @@
   "self": {
     "label": "Autoalojado",
     "title": "Tu memoria vive en tu máquina.",
-    "body": "Corrélo en local para vos en un minuto, o en cualquier host Linux con systemd detrás de HTTPS para todo tu equipo. Alcanza con una Raspberry Pi.",
+    "body": "Corrélo en local para vos en un minuto, o para todo tu equipo en cualquier host Linux con systemd detrás de HTTPS (alcanza con una Raspberry Pi) o en Railway con un clic.",
     "paths": [
       {
         "title": "Local, un usuario",
         "body": "Un comando lo instala y conecta Claude Code.",
-        "href": "https://github.com/aledepaoligampel/brainkeep#quick-start-local-single-user"
+        "href": "https://github.com/aledepaoligampel/brainkeep#quick-start-local-single-user",
+        "icon": "i-download",
+        "iconClass": "ic"
       },
       {
         "title": "Servidor para un equipo",
         "body": "Usuarios, permisos, inicio con Google y backups.",
-        "href": "https://github.com/aledepaoligampel/brainkeep/blob/main/docs/server.md"
+        "href": "https://github.com/aledepaoligampel/brainkeep/blob/main/docs/server.md",
+        "icon": "i-team",
+        "iconClass": "ic"
+      },
+      {
+        "title": "Railway, con un clic",
+        "body": "Servidor de equipo desde un template, con volumen.",
+        "href": "https://railway.com/deploy/brainkeep",
+        "icon": "m-railway",
+        "iconClass": "mk"
       }
     ],
     "note": "macOS (Apple silicon) y Linux. Windows todavía no está soportado.",
