@@ -11,6 +11,17 @@ export const I18N = {
       'claude-ai': ['En claude.ai: Settings → Connectors → Add custom connector. Nombre: Brainkeep. URL:', 'Conectá y autorizá con Google. También queda disponible en la app móvil.'],
       chatgpt: ['En chatgpt.com: Plugins → «+» → Add custom MCP server. Nombre: Brainkeep. URL:', 'Autenticación: OAuth. Creá el plugin, instalalo y autorizá con Google.'],
     },
+    // Without Google sign-in (despliegue-railway S6): the token is the way in.
+    connectIntroToken: 'Cada agente se conecta con tu token personal: agregás la URL y el token en su configuración.',
+    connectStepsToken: {
+      'claude-code': ['En una terminal, con tu token en lugar de <token>:', 'Abrí Claude Code y escribí /mcp: brainkeep aparece conectado.'],
+      codex: ['Agregá esto a ~/.codex/config.toml, con tu token en lugar de <token>:', 'Abrí Codex de nuevo: las herramientas de Brainkeep aparecen solas.'],
+      antigravity: ['Agregá esto a ~/.gemini/config/mcp_config.json (en la app: MCP → «Copy Config File Path»), con tu token en lugar de <token>:', 'Reiniciá Antigravity.'],
+    },
+    connectNeedsGoogle: 'Este cliente solo se conecta con Google, y este servidor no lo tiene configurado. Pedile al admin que lo active.',
+    tokenAdminNoGoogle: 'Como admin no tenés token personal. Invitate en Usuarios con tu email y usá el token de esa invitación, o configurá el inicio de sesión con Google (guía de Railway).',
+    tokenUserNoGoogle: 'Usá el mismo token con el que entraste al panel. Para cambiarlo, pedíselo al admin.',
+    tokenReadKeyNoGoogle: 'Entrá al panel con tu token personal: es el mismo que usan tus agentes.',
     connectNotes: {
       'claude-code': 'En una máquina sin navegador: claude mcp login brainkeep --no-browser.',
       antigravity: 'Si la autorización no termina, usá la opción con token de abajo.',
@@ -123,6 +134,17 @@ export const I18N = {
       'claude-ai': ['On claude.ai: Settings → Connectors → Add custom connector. Name: Brainkeep. URL:', 'Connect and authorize with Google. It is also available in the mobile app.'],
       chatgpt: ['On chatgpt.com: Plugins → "+" → Add custom MCP server. Name: Brainkeep. URL:', 'Authentication: OAuth. Create the plugin, install it and authorize with Google.'],
     },
+    // Without Google sign-in (despliegue-railway S6): the token is the way in.
+    connectIntroToken: 'Each agent connects with your personal token: add the URL and the token to its configuration.',
+    connectStepsToken: {
+      'claude-code': ['In a terminal, with your token instead of <token>:', 'Open Claude Code and type /mcp: brainkeep shows as connected.'],
+      codex: ['Add this to ~/.codex/config.toml, with your token instead of <token>:', 'Start Codex again: the Brainkeep tools show up on their own.'],
+      antigravity: ['Add this to ~/.gemini/config/mcp_config.json (in the app: MCP → "Copy Config File Path"), with your token instead of <token>:', 'Restart Antigravity.'],
+    },
+    connectNeedsGoogle: 'This client only connects with Google, and this server does not have it configured. Ask the admin to enable it.',
+    tokenAdminNoGoogle: 'As the admin you have no personal token. Invite yourself under Users with your email and use that invitation\'s token, or set up Google sign-in (Railway guide).',
+    tokenUserNoGoogle: 'Use the same token you signed in to the panel with. To change it, ask the admin.',
+    tokenReadKeyNoGoogle: 'Sign in to the panel with your personal token: your agents use the same one.',
     connectNotes: {
       'claude-code': 'On a machine without a browser: claude mcp login brainkeep --no-browser.',
       antigravity: 'If authorization does not finish, use the token option below.',

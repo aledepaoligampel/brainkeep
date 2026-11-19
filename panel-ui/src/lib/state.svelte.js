@@ -19,7 +19,7 @@ export const app = $state({
   lang: initialLang(),
   theme: prefs.get('theme') || 'system',
   session: null, // {expires_at, user, admin, csrf}
-  google: false, // whether "Sign in with Google" is configured
+  google: null, // whether "Sign in with Google" is configured; null until /login answers
   booted: false,
   bootError: false,
   status: null,
@@ -125,7 +125,7 @@ export async function boot() {
   fetch('/panel/api/login', { credentials: 'same-origin', cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null))
     .then((config) => { app.google = Boolean(config && config.google === true); })
-    .catch(() => null);
+    .catch(() => { app.google = false; });
   try {
     app.session = await api('session');
   } catch (error) {

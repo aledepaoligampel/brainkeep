@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import { parseMarkdown, lineDiff, safeHref, author } from '../panel-ui/src/lib/markdown.js';
 import { inviteMessage } from '../panel-ui/src/lib/invite.js';
+import { connectView } from '../panel-ui/src/lib/connect.js';
 import { I18N } from '../panel-ui/src/lib/i18n.js';
 
 const ALLOWED = new Set(['p', 'h', 'ul', 'ol', 'li', 'pre', 'text', 'strong', 'em', 'code', 'a', 'br']);
@@ -93,5 +94,56 @@ for (const lang of ['es', 'en']) {
     assert.ok(text.includes(TOKEN) && text.includes('https://m.example.test/mcp'), text);
   }
 }
+
+// "Connect agents" without Google (despliegue-railway S6). A server deployed without a
+// Google client has no OAuth endpoints: the page must not send anyone there.
+const CLIENTS = ['claude-code', 'codex', 'antigravity', 'claude-ai', 'chatgpt'];
+const URL_MCP = 'https://m.example.test/mcp';
+const SESSIONS = {
+  admin: { user: 'admin', admin: true },
+  user: { user: 'ana', admin: false },
+  read: { user: null, admin: false },
+};
+for (const lang of ['es', 'en']) {
+  const t = (key, ...args) => {
+    const v = I18N[lang][key];
+    assert.ok(v !== undefined, `${lang}.${key} missing`);
+    return typeof v === 'string' ? v.replace(/\{(\d)\}/g, (_, i) => args[i]) : v;
+  };
+  const steps = (view, client) => t(view.stepsKey)[client];
+  const words = (view, client) => [t(view.intro), view.note ? t(view.note) : '', ...steps(view, client)].join('\n');
+  for (const [who, session] of Object.entries(SESSIONS)) {
+    for (const client of CLIENTS) {
+      // Without Google: token commands are the main steps, nothing mentions authorizing with Google.
+      const off = connectView({ client, google: false, session, url: URL_MCP, token: '' });
+      assert.equal(off.tokenSection, false, `${who}/${client}`);
+      assert.equal(off.canIssue, false, `${who}/${client}: no Google session can issue a token`);
+      if (['claude-ai', 'chatgpt'].includes(client)) {
+        assert.equal(off.primary, null, client);
+        assert.equal(off.note, 'connectNeedsGoogle', client);
+      } else {
+        assert.ok(off.primary.length > 0 && off.primary.every((b) => b.includes('Authorization') && b.includes(URL_MCP)), client);
+        assert.ok(off.primary.every((b) => b.includes('<token>')), client);
+        assert.equal(off.note, { admin: 'tokenAdminNoGoogle', user: 'tokenUserNoGoogle', read: 'tokenReadKeyNoGoogle' }[who], `${who}/${client}`);
+        assert.equal(steps(off, client).length, off.primary.length + 1, client);
+        assert.ok(!off.primary.some((b) => b.includes('mcp login')), client);
+        assert.ok(!/autoriz|authoriz/i.test(words(off, client)), `${lang}/${who}/${client}: ${words(off, client)}`);
+      }
+      assert.ok(!/con Google|with Google|tu cuenta de Google|your Google account/.test(t(off.intro)), `${lang} intro`);
+      // With Google: unchanged OAuth flow, token as a fallback section.
+      const on = connectView({ client, google: true, session, url: URL_MCP, token: '' });
+      assert.equal(on.intro, 'connectIntro');
+      assert.equal(on.tokenSection, true);
+      assert.ok(on.primary.every((b) => !b.includes('Authorization')), client);
+      assert.equal(on.canIssue, who === 'user');
+    }
+  }
+  // The admin note points to self-invitation and the Railway guide.
+  assert.match(t('tokenAdminNoGoogle'), /railway|Railway/);
+  assert.ok(t('tokenAdminNoGoogle').includes(lang === 'es' ? 'Usuarios' : 'Users'));
+}
+// An issued token replaces the placeholder (Google mode, signed-in user).
+const issued = connectView({ client: 'claude-code', google: true, session: SESSIONS.user, url: URL_MCP, token: TOKEN });
+assert.ok(issued.token[0].includes('Bearer ' + TOKEN));
 
 console.log('panel_render: ok');

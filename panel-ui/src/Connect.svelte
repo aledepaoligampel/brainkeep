@@ -1,9 +1,10 @@
 <script>
-  // How to connect each agent. OAuth first: every client below signs in with the
-  // user's Google account, so no token travels by chat. A personal token remains for
-  // machines without a browser; issuing one replaces the previous token.
+  // How to connect each agent. With Google sign-in, OAuth first: no token travels by
+  // chat, and a personal token remains for machines without a browser (issuing one
+  // replaces the previous token). Without it, the token is the way in (lib/connect.js).
   import { app, t, send } from './lib/state.svelte.js';
-  import { AGENT_MARKS } from './lib/agents.js';
+  import { AGENT_MARKS, REPO } from './lib/agents.js';
+  import { connectView } from './lib/connect.js';
   import PageHeader from './lib/PageHeader.svelte';
 
   const url = location.origin + '/mcp';
@@ -14,32 +15,9 @@
   let error = $state('');
   let copied = $state('');
 
-  // Snippets per client: `oauth` without a token, `token` with one (null: not supported).
-  function snippets(id, secret) {
-    const bearer = 'Bearer ' + secret;
-    switch (id) {
-      case 'claude-code':
-        return {
-          oauth: [`claude mcp add --transport http --scope user brainkeep ${url}`],
-          token: [`claude mcp add --transport http --scope user brainkeep ${url} --header "Authorization: ${bearer}"`],
-        };
-      case 'codex':
-        return {
-          oauth: [`[mcp_servers.brainkeep]\nurl = "${url}"`, 'codex mcp login brainkeep'],
-          token: [`[mcp_servers.brainkeep]\nurl = "${url}"\nhttp_headers = { Authorization = "${bearer}" }`],
-        };
-      case 'antigravity':
-        return {
-          oauth: [JSON.stringify({ mcpServers: { brainkeep: { serverUrl: url } } }, null, 2)],
-          token: [JSON.stringify({ mcpServers: { brainkeep: { serverUrl: url, headers: { Authorization: bearer } } } }, null, 2)],
-        };
-      default:
-        return { oauth: [url], token: null };
-    }
-  }
-  const current = $derived(snippets(client, token || '<token>'));
-  const steps = $derived(t('connectSteps')[client]);
-  const canIssue = $derived(Boolean(app.session?.user) && !app.session?.admin);
+  const view = $derived(connectView({ client, google: app.google, session: app.session, url, token }));
+  const steps = $derived(t(view.stepsKey)[client]);
+  const guide = REPO + '/blob/main/docs/railway.md';
 
   async function copy(text, key) {
     try { await navigator.clipboard.writeText(text); copied = key; setTimeout(() => { if (copied === key) copied = ''; }, 2000); }
@@ -57,7 +35,7 @@
 </script>
 
 <section class="page connect" aria-labelledby="connect-title">
-  <PageHeader id="connect-title" title={t('connect')} description={t('connectIntro')} />
+  <PageHeader id="connect-title" title={t('connect')} description={t(view.intro)} />
 
   <div class="field">
     <span class="label">{t('serverUrl')}</span>
@@ -67,6 +45,7 @@
     </div>
   </div>
 
+  {#if app.google !== null}
   <div class="tabs" role="tablist" aria-label={t('connect')}>
     {#each clients as id}
       <button type="button" role="tab" aria-selected={client === id} class:on={client === id} onclick={() => (client = id)}>
@@ -77,43 +56,50 @@
   </div>
 
   <div class="panel" role="tabpanel">
-    <ol class="steps">
-      {#each current.oauth as block, i}
-        <li>
-          <p>{steps[i]}</p>
-          <div class="code">
-            <pre>{block}</pre>
-            <button type="button" class="btn" onclick={() => copy(block, 'o' + i)}>{copied === 'o' + i ? t('copiedShort') : t('copyShort')}</button>
-          </div>
-        </li>
-      {/each}
-      <li><p>{steps[current.oauth.length]}</p></li>
-    </ol>
-    {#if t('connectNotes')[client]}<p class="muted small">{t('connectNotes')[client]}</p>{/if}
+    {#if view.primary}
+      <ol class="steps">
+        {#each view.primary as block, i}
+          <li>
+            <p>{steps[i]}</p>
+            <div class="code">
+              <pre>{block}</pre>
+              <button type="button" class="btn" onclick={() => copy(block, 'o' + i)}>{copied === 'o' + i ? t('copiedShort') : t('copyShort')}</button>
+            </div>
+          </li>
+        {/each}
+        <li><p>{steps[view.primary.length]}</p></li>
+      </ol>
+    {/if}
+    {#if view.tokenSection}
+      {#if t('connectNotes')[client]}<p class="muted small">{t('connectNotes')[client]}</p>{/if}
+    {:else}
+      <p class="small">{t(view.note)}{#if view.note === 'tokenAdminNoGoogle'} <a href={guide} target="_blank" rel="noopener noreferrer">docs/railway.md</a>{/if}</p>
+    {/if}
   </div>
 
-  <details class="token">
-    <summary>{t('tokenSectionTitle')}</summary>
-    <p class="muted small">{t('tokenSectionHelp')}</p>
-    {#if !current.token}
-      <p class="small">{t('tokenUnsupported')}</p>
-    {:else if !canIssue}
-      <p class="small">{app.session?.admin ? t('tokenAdmin') : t('tokenReadKey')}</p>
-    {:else}
-      {#if token}
-        <p class="warn small">{t('tokenOnceSelf')}</p>
+  {#if view.tokenSection}
+    <details class="token">
+      <summary>{t('tokenSectionTitle')}</summary>
+      <p class="muted small">{t('tokenSectionHelp')}</p>
+      {#if view.note}
+        <p class="small">{t(view.note)}</p>
       {:else}
-        <button type="button" class="btn" disabled={busy} onclick={issue}>{busy ? t('working') : t('generateToken')}</button>
-        {#if error}<p class="error small" role="alert">{error}</p>{/if}
+        {#if token}
+          <p class="warn small">{t('tokenOnceSelf')}</p>
+        {:else}
+          <button type="button" class="btn" disabled={busy} onclick={issue}>{busy ? t('working') : t('generateToken')}</button>
+          {#if error}<p class="error small" role="alert">{error}</p>{/if}
+        {/if}
+        {#each view.token as block, i}
+          <div class="code">
+            <pre>{block}</pre>
+            <button type="button" class="btn" disabled={!token} onclick={() => copy(block, 't' + i)}>{copied === 't' + i ? t('copiedShort') : t('copyShort')}</button>
+          </div>
+        {/each}
       {/if}
-      {#each current.token as block, i}
-        <div class="code">
-          <pre>{block}</pre>
-          <button type="button" class="btn" disabled={!token} onclick={() => copy(block, 't' + i)}>{copied === 't' + i ? t('copiedShort') : t('copyShort')}</button>
-        </div>
-      {/each}
-    {/if}
-  </details>
+    </details>
+  {/if}
+  {/if}
 </section>
 
 <style>
