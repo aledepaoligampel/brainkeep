@@ -87,6 +87,8 @@ Google sign-in, the web panel, backups and upgrades.
 Or deploy the container image: on Railway in one click, or on any Docker host. See
 [docs/railway.md](docs/railway.md).
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/brainkeep)
+
 Then connect your clients: [docs/clients.md](docs/clients.md).
 
 ## Claude Code plugin

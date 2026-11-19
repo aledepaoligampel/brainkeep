@@ -26,17 +26,31 @@ Generate a key with `openssl rand -hex 32`.
 
 ## Railway in one click
 
-Deploy from the template: **[Deploy on Railway](TEMPLATE_URL)** (the link is added
-once the template is published, see below).
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/brainkeep)
 
-1. Fill in `BRAINKEEP_ADMIN_EMAIL` and, for Google sign-in, the Google client. The
-   template generates `PANEL_ADMIN_KEY`.
+1. Optionally fill in `BRAINKEEP_ADMIN_EMAIL` and, for Google sign-in, the Google
+   client; all three can be added later. The template generates `PANEL_ADMIN_KEY`.
 2. When it is up, copy `PANEL_ADMIN_KEY` from the service's **Variables** tab and open
    `https://<your domain>/panel`. Sign in with that key.
 3. **Users → Invite**: each person gets a message with the MCP URL and a personal
    token. Connect clients: [clients.md](clients.md).
 
 Keep one replica: a single process owns the SQLite database.
+
+### Updating
+
+Railway does not redeploy a template service when Brainkeep changes. When a new
+version lands on `main`, Railway shows that an update is available for the service;
+apply it when it suits you ([Railway docs](https://docs.railway.com/templates/updates)).
+If your GitHub account was connected when you deployed, Railway copied the repository
+into it and offers the update as a branch you can test first.
+
+Memories and credentials live in the `/data` volume, so an update keeps them. Schema
+migrations run on start and leave a `pre-v<N>.sqlite` snapshot; an older version
+cannot open a newer schema, so roll back by restoring that snapshot
+([server.md](server.md)). To deploy changes automatically instead, eject to your own
+copy of the repository (service **Settings → Source → Upstream Repo → Eject**): every
+push to that copy deploys, and keeping it in sync with Brainkeep is up to you.
 
 ### Publishing the template (maintainers)
 
@@ -51,10 +65,13 @@ In Railway: **Workspace → Templates → New Template**, then:
   - `BRAINKEEP_CLIENT_IP_HEADER` = `X-Real-IP`
   - `BRAINKEEP_ADMIN_EMAIL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`: empty,
     with a description, optional.
-- Publish, and add the button to this page and the README:
+- Icon `https://brainkeep.dev/favicon.svg`, and an overview with the sections the
+  marketplace requires.
+- Publish (the published template is `https://railway.com/deploy/brainkeep`), and
+  link the button from this page and the README:
 
 ```markdown
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/<template>?referralCode=<code>&utm_medium=integration&utm_source=template&utm_campaign=brainkeep)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/brainkeep)
 ```
 
 Template functions such as `secret()` run once, when someone deploys the template.
