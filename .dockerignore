@@ -1,0 +1,13 @@
+target
+.git
+.brainkeep
+.local-tools
+panel-ui/node_modules
+site
+site-src
+benchmarks
+pcdd
+docs
+tests
+*.db
+*.sqlite

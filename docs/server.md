@@ -45,6 +45,12 @@ client**; otherwise every client shares one limit, or a client can spoof it.
 Cloudflare does this at its edge. With Caddy: `header_up CF-Connecting-IP {remote_host}`;
 with nginx: `proxy_set_header CF-Connecting-IP $remote_addr;`.
 
+Without Cloudflare, name the header your proxy overwrites with
+`--client-ip-header`, for example `--client-ip-header X-Real-IP`. `--http-listen`
+changes the listen address (default `127.0.0.1`); use `0.0.0.0` or `::` only when the
+proxy reaches the service over the network, as in a container. Railway and Docker:
+see [railway.md](railway.md).
+
 `/etc/brainkeep/env` holds `BRAINKEEP_HOST` and `BRAINKEEP_ARGS` (extra
 flags, for example `--oauth-file /etc/brainkeep/google.json`). Restart the
 service after changing it.

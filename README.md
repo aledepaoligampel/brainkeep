@@ -84,6 +84,9 @@ Run it on any Linux host with systemd behind an HTTPS reverse proxy (Caddy, ngin
 a tunnel). See [docs/server.md](docs/server.md): install, tokens, users and sharing,
 Google sign-in, the web panel, backups and upgrades.
 
+Or deploy the container image: on Railway in one click, or on any Docker host. See
+[docs/railway.md](docs/railway.md).
+
 Then connect your clients: [docs/clients.md](docs/clients.md).
 
 ## Claude Code plugin

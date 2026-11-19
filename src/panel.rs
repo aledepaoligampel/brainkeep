@@ -279,17 +279,11 @@ impl Panel {
         let expected = format!("https://{}", self.host);
         matches!((origins.next(), origins.next()), (Some(o), None) if o.as_bytes() == expected.as_bytes())
     }
-    /// Throttle bucket. Cloudflare overwrites `CF-Connecting-IP` at its edge and the
-    /// origin listens on loopback only, so the header identifies remote clients.
-    /// Without it (or once the table is full) every attempt shares one bucket.
+    /// Throttle bucket. The proxy overwrites the client IP header (`crate::client_ip`),
+    /// so it identifies remote clients. Without it (or once the table is full) every
+    /// attempt shares one bucket.
     fn client(headers: &HeaderMap) -> String {
-        let mut values = headers.get_all("cf-connecting-ip").iter();
-        match (values.next().and_then(|v| v.to_str().ok()), values.next()) {
-            (Some(ip), None) => ip
-                .parse::<std::net::IpAddr>()
-                .map_or_else(|_| String::new(), |ip| ip.to_string()),
-            _ => String::new(),
-        }
+        crate::client_ip::get(headers).map_or_else(String::new, |ip| ip.to_string())
     }
     /// Counts this attempt as a failure in advance; `forgive` undoes it on success.
     /// Returns the bucket used, or None while that bucket's window is exhausted.

@@ -362,9 +362,8 @@ impl OAuth {
             self.base
         )
     }
-    /// Fixed window per endpoint class and client. Cloudflare overwrites
-    /// `CF-Connecting-IP` at its edge and the origin listens on loopback, so the header
-    /// identifies remote clients (IPv6 grouped by /64, what one host usually controls);
+    /// Fixed window per endpoint class and client. The proxy overwrites the client IP
+    /// header (`crate::client_ip`), so it identifies remote clients (IPv6 grouped by /64, what one host usually controls);
     /// without it they share one bucket. A full table evicts its oldest window, so
     /// churning addresses can only reset limits, never lock others out.
     fn allow(&self, class: &'static str, headers: &HeaderMap) -> bool {
@@ -373,17 +372,13 @@ impl OAuth {
             "token" => (120, Duration::from_secs(60)),
             _ => (60, Duration::from_secs(60)),
         };
-        let mut values = headers.get_all("cf-connecting-ip").iter();
-        let client = match (values.next().and_then(|v| v.to_str().ok()), values.next()) {
-            (Some(ip), None) => match ip.parse::<std::net::IpAddr>() {
-                Ok(std::net::IpAddr::V6(v6)) => {
-                    let s = v6.segments();
-                    format!("{:x}:{:x}:{:x}:{:x}::/64", s[0], s[1], s[2], s[3])
-                }
-                Ok(v4) => v4.to_string(),
-                Err(_) => String::new(),
-            },
-            _ => String::new(),
+        let client = match crate::client_ip::get(headers) {
+            Some(std::net::IpAddr::V6(v6)) => {
+                let s = v6.segments();
+                format!("{:x}:{:x}:{:x}:{:x}::/64", s[0], s[1], s[2], s[3])
+            }
+            Some(v4) => v4.to_string(),
+            None => String::new(),
         };
         let mut limits = self.limits.lock().unwrap_or_else(|e| e.into_inner());
         let key = (class, client);

@@ -13,6 +13,7 @@ use tokio::{
     sync::{Semaphore, mpsc},
     task::JoinSet,
 };
+mod client_ip;
 mod http;
 mod mcp;
 mod oauth;
@@ -35,7 +36,7 @@ struct Args {
 }
 #[derive(Subcommand)]
 enum Command {
-    /// Run the storage owner; optionally enable authenticated loopback HTTP.
+    /// Run the storage owner; optionally enable authenticated HTTP (loopback by default).
     Serve {
         #[arg(long, requires_all = ["auth_file", "http_host"])]
         http_port: Option<u16>,
@@ -43,6 +44,13 @@ enum Command {
         auth_file: Option<PathBuf>,
         #[arg(long, requires = "http_port")]
         http_host: Option<String>,
+        /// Address to listen on (default 127.0.0.1). Use 0.0.0.0 or :: only behind a
+        /// proxy that sets the client IP header.
+        #[arg(long, requires = "http_port")]
+        http_listen: Option<std::net::IpAddr>,
+        /// Header the proxy overwrites with the client address (default CF-Connecting-IP).
+        #[arg(long, requires = "http_port")]
+        client_ip_header: Option<String>,
         /// Enable the read-only web panel with a dedicated credential file.
         #[arg(long, requires = "http_port")]
         panel_auth_file: Option<PathBuf>,
@@ -97,13 +105,19 @@ async fn run(args: Args) -> Result<(), String> {
             http_port,
             auth_file,
             http_host,
+            http_listen,
+            client_ip_header,
             panel_auth_file,
             oauth_file,
             owner,
         } => {
+            if let Some(name) = client_ip_header {
+                client_ip::configure(&name)?;
+            }
             let remote = match (http_port, auth_file, http_host) {
                 (Some(port), Some(auth), Some(host)) => Some(
                     http::prepare(
+                        http_listen.unwrap_or(std::net::Ipv4Addr::LOCALHOST.into()),
                         port,
                         &auth,
                         host,
@@ -250,7 +264,7 @@ async fn serve(
     let mut terminate = tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
         .map_err(|_| "cannot install shutdown handler")?;
     if remote.is_some() {
-        eprintln!("Brainkeep ready (private socket and authenticated loopback HTTP)");
+        eprintln!("Brainkeep ready (private socket and authenticated HTTP)");
     } else {
         eprintln!("Brainkeep ready (private local socket, no TCP listener)");
     }

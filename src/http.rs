@@ -34,6 +34,7 @@ pub struct Prepared {
 }
 
 pub async fn prepare(
+    listen: std::net::IpAddr,
     port: u16,
     auth: &Path,
     host: String,
@@ -75,9 +76,9 @@ pub async fn prepare(
         Some(path) => Some(crate::oauth::load(path)?),
         None => None,
     };
-    let listener = TcpListener::bind((std::net::Ipv4Addr::LOCALHOST, port))
+    let listener = TcpListener::bind((listen, port))
         .await
-        .map_err(|_| "cannot bind loopback HTTP port")?;
+        .map_err(|_| "cannot bind HTTP port")?;
     Ok(Prepared {
         listener,
         credentials,
