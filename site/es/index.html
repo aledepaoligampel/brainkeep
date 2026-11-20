@@ -21,7 +21,7 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Brainkeep — Tus agentes olvidan. Brainkeep recuerda.">
 <meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Brainkeep", "url": "https://brainkeep.dev/es/", "inLanguage": "es", "description": "Memoria compartida y bajo tu control para agentes de IA. Claude Code, Codex y cualquier cliente MCP comparten decisiones entre sesiones y personas.", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "Servidor de memoria compartida para agentes de IA (MCP)", "operatingSystem": "macOS, Linux", "softwareVersion": "0.1.1", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "license": "https://opensource.org/licenses/MIT", "image": "https://brainkeep.dev/og-es.png", "downloadUrl": "https://github.com/aledepaoligampel/brainkeep/releases", "sameAs": "https://github.com/aledepaoligampel/brainkeep"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Brainkeep", "url": "https://brainkeep.dev/es/", "inLanguage": "es", "description": "Memoria compartida y bajo tu control para agentes de IA. Claude Code, Codex y cualquier cliente MCP comparten decisiones entre sesiones y personas.", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "Servidor de memoria compartida para agentes de IA (MCP)", "operatingSystem": "macOS, Linux", "softwareVersion": "0.1.2", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "license": "https://opensource.org/licenses/MIT", "image": "https://brainkeep.dev/og-es.png", "downloadUrl": "https://github.com/aledepaoligampel/brainkeep/releases", "sameAs": "https://github.com/aledepaoligampel/brainkeep"}</script>
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#F9EEF0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1E171A" media="(prefers-color-scheme: dark)">
@@ -96,7 +96,7 @@
 <section class="hero" id="top">
   <div class="wrap hero-inner">
     <div class="hero-copy">
-      <p class="pill"><span class="live-dot"></span>Código abierto · servidor MCP · v0.1.1</p>
+      <p class="pill"><span class="live-dot"></span>Código abierto · servidor MCP · v0.1.2</p>
       <h1 class="display"><span>Tus agentes olvidan.</span> <em>Brainkeep recuerda.</em></h1>
       <p class="lead serif">Lo que tus agentes deciden, descubren y recuerdan, en un solo lugar, compartido entre sesiones, herramientas y personas.</p>
       <div class="actions">
@@ -326,7 +326,7 @@
             <button type="button" class="btn copy" data-copy="qs-macos" data-copied="Copiado" data-status="Copiado." aria-label="Copiar los comandos de instalación manual"><svg class="ic" aria-hidden="true" width="16" height="16"><use href="#i-copy"/></svg><span class="copy-text">Copiar</span></button>
           </div>
           <pre class="code terminal-body" id="qs-macos" tabindex="0" role="region" aria-label="Instalar a mano · macOS"><span class="c"># 1 · Descargar y verificar</span>
-v=0.1.1; t=brainkeep-$v-aarch64-macos
+v=0.1.2; t=brainkeep-$v-aarch64-macos
 repo=https://github.com/aledepaoligampel/brainkeep
 base=$repo/releases/download/v$v
 curl -fLO $base/$t.tar.gz &amp;&amp; curl -fLO $base/SHA256SUMS
@@ -343,7 +343,7 @@ cp $t/brainkeep ~/.local/bin/
 claude mcp add --scope user brainkeep -- \
   ~/.local/bin/brainkeep --data-dir ~/.brainkeep mcp</pre>
           <pre class="code terminal-body" id="qs-linux" tabindex="0" role="region" aria-label="Instalar a mano · Linux" hidden><span class="c"># 1 · Descargar y verificar</span>
-v=0.1.1; t=brainkeep-$v-$(uname -m)-linux
+v=0.1.2; t=brainkeep-$v-$(uname -m)-linux
 repo=https://github.com/aledepaoligampel/brainkeep
 base=$repo/releases/download/v$v
 curl -fLO $base/$t.tar.gz &amp;&amp; curl -fLO $base/SHA256SUMS
@@ -388,7 +388,7 @@ claude mcp add --scope user brainkeep -- \
       <a href="https://github.com/aledepaoligampel/brainkeep/releases">Releases</a>
       <a href="https://github.com/aledepaoligampel/brainkeep/blob/main/LICENSE">MIT</a>
     </nav>
-    <span>Versión temprana · v0.1.1</span>
+    <span>Versión temprana · v0.1.2</span>
   </div>
   <p class="wrap trademarks">Claude, Codex y Antigravity son marcas de sus respectivos dueños; Brainkeep no está afiliado a ellos.</p>
 </footer>

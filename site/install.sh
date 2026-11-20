@@ -3,7 +3,7 @@
 #
 #   curl -fsSL https://brainkeep.dev/install.sh | sh
 #
-# It downloads release 0.1.1 from GitHub, checks it against the release's SHA256SUMS,
+# It downloads release 0.1.2 from GitHub, checks it against the release's SHA256SUMS,
 # installs ~/.local/bin/brainkeep, keeps `brainkeep serve` running as a user service
 # (launchd on macOS, systemd --user on Linux) and connects Claude Code. No root needed.
 # Run it again to upgrade: data in ~/.brainkeep is kept. BRAINKEEP_VERSION picks another
@@ -172,7 +172,7 @@ connect_claude() {
 }
 
 main() {
-  version=${BRAINKEEP_VERSION:-0.1.1}
+  version=${BRAINKEEP_VERSION:-0.1.2}
   version=${version#v}
   repo=https://github.com/aledepaoligampel/brainkeep
   [ -n "${HOME:-}" ] || fail "HOME is not set"
