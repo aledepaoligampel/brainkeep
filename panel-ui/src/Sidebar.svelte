@@ -15,6 +15,26 @@
   const connection = $derived({
     live: [t('live'), 'pulse'], reconnecting: [t('reconnecting'), 'warn'], offline: [t('offline'), 'off'], idle: [t('live'), ''],
   }[app.connection]);
+
+  // Fade the project list's edges only where more items hide past them.
+  let lists = $state();
+  let fadeStart = $state(false);
+  let fadeEnd = $state(false);
+  function edges() {
+    if (!lists) return;
+    const { scrollTop, scrollLeft, scrollHeight, scrollWidth, clientHeight, clientWidth } = lists;
+    fadeStart = scrollTop > 1 || scrollLeft > 1;
+    fadeEnd = scrollTop + clientHeight < scrollHeight - 1 || scrollLeft + clientWidth < scrollWidth - 1;
+  }
+  $effect(() => {
+    void mine.length; void shared.length; void app.session?.admin;
+    if (!lists) return;
+    const observer = new ResizeObserver(edges);
+    observer.observe(lists);
+    for (const child of lists.children) observer.observe(child);
+    edges();
+    return () => observer.disconnect();
+  });
 </script>
 
 <nav class="side" aria-label={t('projects')}>
@@ -26,7 +46,7 @@
     <kbd>{isMac ? '⌘K' : 'Ctrl K'}</kbd>
   </button>
 
-  <div class="lists">
+  <div class="lists" class:fade-start={fadeStart} class:fade-end={fadeEnd} bind:this={lists} onscroll={edges}>
   <div class="group">
     <a class="nav" class:on={!app.route.scoped && !app.route.users && !app.route.connect && !app.route.filters.archived} href={listHref('', {})}>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>{t('memories')}
@@ -143,16 +163,21 @@
 </nav>
 
 <style>
-  .side { width: 100%; height: 100%; padding: 24px 16px 16px; display: flex; flex-direction: column; gap: 24px; background: var(--side);
+  .side { position: relative; width: 100%; height: 100%; padding: 24px 16px 16px; display: flex; flex-direction: column; gap: 24px; background: var(--side);
     border-right: 1px solid var(--side-line); overflow-y: auto; }
   svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
-  .brand { display: flex; align-items: center; gap: 10px; padding: 0 6px; color: var(--ink); text-decoration: none; }
+  .brand { flex: 0 0 auto; display: flex; align-items: center; gap: 10px; padding: 0 6px; color: var(--ink); text-decoration: none; }
   .brand span { font: italic 400 24px/1 var(--serif); letter-spacing: -0.01em; }
-  .search { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--side-line);
+  .search { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--side-line);
     background: var(--surface); color: var(--muted); cursor: pointer; box-shadow: var(--shadow-sm); text-align: left; }
   .search span { flex: 1; }
   kbd { font: 11px var(--mono); color: var(--muted); }
-  .lists { display: flex; flex-direction: column; gap: 24px; }
+  /* Projects scroll on their own; padding keeps focus rings inside the clip. */
+  .lists { --fade-start: 0px; --fade-end: 0px; display: flex; flex-direction: column; gap: 24px; flex: 1 1 auto; min-height: 0;
+    overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; margin: -4px -6px; padding: 4px 6px;
+    mask-image: linear-gradient(to bottom, transparent, #000 var(--fade-start), #000 calc(100% - var(--fade-end)), transparent); }
+  .lists.fade-start { --fade-start: 32px; }
+  .lists.fade-end { --fade-end: 32px; }
   .group { display: flex; flex-direction: column; gap: 2px; }
   .group .label { padding: 0 10px 8px; }
   .nav { display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 0 10px; border-radius: 10px; color: var(--ink-2); text-decoration: none; }
@@ -203,7 +228,9 @@
     .me :global(.me-row:hover) { background: transparent; }
     .who { display: none; }
     .avatar { width: 36px; height: 36px; font-size: 17px; }
-    .lists { order: 4; flex: 1 1 100%; flex-direction: row; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+    .lists { order: 4; flex: 1 1 100%; flex-direction: row; gap: 6px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
+      min-height: auto; margin: -2px -16px; padding: 2px 16px;
+      mask-image: linear-gradient(to right, transparent, #000 var(--fade-start), #000 calc(100% - var(--fade-end)), transparent); }
     .group { flex: 0 0 auto; flex-direction: row; gap: 6px; }
     .group .label { display: none; }
     .nav { flex: 0 0 auto; min-height: 36px; border: 1px solid var(--side-line); background: var(--surface); }
