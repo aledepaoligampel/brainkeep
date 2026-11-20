@@ -43,7 +43,7 @@ exists. Data lives in `~/.brainkeep`. No root needed. Run it again to upgrade; s
 <summary>Manual install</summary>
 
 ```sh
-v=0.1.1; t=brainkeep-$v-aarch64-macos    # Linux: t=brainkeep-$v-$(uname -m)-linux
+v=0.1.2; t=brainkeep-$v-aarch64-macos    # Linux: t=brainkeep-$v-$(uname -m)-linux
 base=https://github.com/aledepaoligampel/brainkeep/releases/download/v$v
 curl -fLO $base/$t.tar.gz && curl -fLO $base/SHA256SUMS
 grep " $t.tar.gz\$" SHA256SUMS | shasum -a 256 -c
