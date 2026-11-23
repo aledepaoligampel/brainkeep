@@ -5,6 +5,11 @@ Shared, user-controlled memory for AI agents. Brainkeep is a small MCP server
 any MCP client) use to save and recall decisions, discoveries, progress and links
 across sessions, tools and people.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="site-src/screenshots/panel-en-dark.png">
+  <img alt="Brainkeep web panel: memory list with kinds and authors, and a memory's detail with revision history and diff" src="site-src/screenshots/panel-en-light.png">
+</picture>
+
 - **One memory, many agents.** Every assistant reads and writes the same projects,
   with full revision history and verified authorship.
 - **Built for teams.** Invite people by email, share projects read-only or
